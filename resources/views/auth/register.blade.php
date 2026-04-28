@@ -35,13 +35,36 @@
                     @csrf
                     
                     @if($referrer)
+                        {{-- Pre-filled via ?ref= URL: show referrer info and hidden ID --}}
                         <div class="mb-3">
                             <label class="form-label font-weight-bold small">Sponsor (Upline)</label>
-                            <div class="form-control-plaintext bg-light px-3 py-2 rounded-3 small">
+                            <div class="form-control-plaintext bg-light px-3 py-2 rounded-3 small d-flex align-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-inline me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /></svg>
-                                <strong>{{ $referrer->nama }}</strong> <span class="text-muted">(@ {{ $referrer->user->username }})</span>
+                                <strong>{{ $referrer->nama }}</strong>&nbsp;<span class="text-muted">({{ $referrer->referral_code }})</span>
                             </div>
                             <input type="hidden" name="referral_agent_id" value="{{ $referrer->id }}">
+                        </div>
+                    @else
+                        {{-- No pre-filled referrer: allow manual code entry --}}
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold small" for="referral_code">
+                                Kode Referral <span class="text-muted fw-normal">(Opsional)</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="referral_code"
+                                name="referral_code"
+                                class="form-control rounded-3 py-2 text-uppercase @error('referral_code') is-invalid @enderror"
+                                value="{{ old('referral_code') }}"
+                                placeholder="Contoh: SBFA1B2C3"
+                                maxlength="20"
+                                autocomplete="off"
+                            >
+                            @error('referral_code')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @else
+                                <small class="text-muted small mt-1 d-block">Masukkan kode referral dari agen yang mengajak Anda bergabung.</small>
+                            @enderror
                         </div>
                     @endif
 
@@ -49,6 +72,24 @@
                         <label class="form-label font-weight-bold small">Nama Lengkap</label>
                         <input type="text" name="nama" class="form-control rounded-3 py-2 @error('nama') is-invalid @enderror" value="{{ old('nama') }}" placeholder="Contoh: Budi Santoso" required>
                         @error('nama') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold small">Nomor Telepon</label>
+                        <input
+                            type="text"
+                            name="phone"
+                            class="form-control rounded-3 py-2 @error('phone') is-invalid @enderror"
+                            value="{{ old('phone') }}"
+                            placeholder="08123456789"
+                            maxlength="15"
+                            autocomplete="off"
+                        >
+                        @error('phone')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @else
+                            <small class="text-muted small mt-1 d-block">Nomor WhatsApp aktif untuk keperluan komunikasi bisnis.</small>
+                        @enderror
                     </div>
                     
                     <div class="mb-3">

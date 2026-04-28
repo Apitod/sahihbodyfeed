@@ -74,6 +74,7 @@ class AgentRegistrationService
             $agent = Agent::create([
                 'user_id'      => $user->id,
                 'nama'         => $data['nama'],
+                'phone'        => $data['phone'] ?? null,
                 'upline_id'    => $data['referral_agent_id'] ?? null,
                 'total_points' => 0,
                 'status'       => AgentStatus::Agent,

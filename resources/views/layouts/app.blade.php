@@ -148,5 +148,28 @@
     </div>
     <!-- Core JS -->
     <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+    <script>
+        /**
+         * Copy text to clipboard and briefly change the button to show feedback.
+         * @param {string} text  - The text to copy.
+         * @param {HTMLElement} btn - The button that was clicked (for visual feedback).
+         */
+        function copyToClipboard(text, btn) {
+            navigator.clipboard.writeText(text).then(function () {
+                const original = btn.innerHTML;
+                btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>';
+                btn.classList.add('btn-success');
+                btn.classList.remove('btn-outline-primary', 'btn-outline-secondary');
+                setTimeout(function () {
+                    btn.innerHTML = original;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add(btn.dataset.originalClass || 'btn-outline-primary');
+                }, 1800);
+            }).catch(function () {
+                alert('Gagal menyalin. Silakan salin secara manual.');
+            });
+        }
+    </script>
+    @yield('scripts')
 </body>
 </html>
