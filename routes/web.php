@@ -54,4 +54,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/verifications/rewards', [Admin\RewardVerificationController::class, 'index'])->name('verifications.rewards');
     Route::post('/verifications/rewards/{claim}/approve', [Admin\RewardVerificationController::class, 'approve'])->name('rewards.approve');
     Route::post('/verifications/rewards/{claim}/reject', [Admin\RewardVerificationController::class, 'reject'])->name('rewards.reject');
+
+    // ─── Agent Management ─────────────────────────────────────────────────────
+    Route::resource('agents', Admin\AgentController::class);
+    Route::post('/agents/{agent}/approve',  [Admin\AgentController::class, 'approve'])->name('agents.approve');
+    Route::post('/agents/{agent}/suspend',  [Admin\AgentController::class, 'suspend'])->name('agents.suspend');
 });

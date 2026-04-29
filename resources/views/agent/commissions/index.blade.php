@@ -8,6 +8,16 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Komisi Transaksi Downline</h3>
+                <div class="card-actions">
+                    <form action="{{ route('agent.commissions') }}" method="GET" id="filterForm">
+                        <select name="generation_level" class="form-select form-select-sm" onchange="document.getElementById('filterForm').submit()">
+                            <option value="">Semua Level</option>
+                            <option value="1" {{ request('generation_level') == '1' ? 'selected' : '' }}>Generasi 1</option>
+                            <option value="2" {{ request('generation_level') == '2' ? 'selected' : '' }}>Generasi 2</option>
+                            <option value="3" {{ request('generation_level') == '3' ? 'selected' : '' }}>Generasi 3</option>
+                        </select>
+                    </form>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table card-table table-vcenter text-nowrap datatable">
