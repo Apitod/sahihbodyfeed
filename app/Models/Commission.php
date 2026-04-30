@@ -50,13 +50,21 @@ class Commission extends Model
         return $this->belongsTo(Agent::class, 'recipient_id');
     }
 
-    // ─── Scopes ───────────────────────────────────────────────────────────────
+    // ─── Scopes ───────────────────────────────────────────────────────────────────
 
+    /** Commissions created today — waiting for the overnight cron to process them. */
+    public function scopeMenunggu($query)
+    {
+        return $query->where('status', CommissionStatus::Menunggu);
+    }
+
+    /** Commissions already processed by the cron — ready for admin disbursement. */
     public function scopePending($query)
     {
         return $query->where('status', CommissionStatus::Pending);
     }
 
+    /** Commissions that have been successfully disbursed. */
     public function scopePaid($query)
     {
         return $query->where('status', CommissionStatus::Paid);

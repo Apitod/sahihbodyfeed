@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Agent;
 use App\Http\Controllers\ProfileController;
@@ -11,13 +10,10 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Auth Routes
+// Auth Routes (login only — self-registration has been removed; admins create agents)
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-    
-    Route::get('/register', [RegistrationController::class, 'showRegistrationForm'])->name('register');
-    Route::post('/register', [RegistrationController::class, 'processRegistration'])->name('register.post');
 });
 
 Route::middleware('auth')->group(function () {
@@ -59,4 +55,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('agents', Admin\AgentController::class);
     Route::post('/agents/{agent}/approve',  [Admin\AgentController::class, 'approve'])->name('agents.approve');
     Route::post('/agents/{agent}/suspend',  [Admin\AgentController::class, 'suspend'])->name('agents.suspend');
+
+    // ─── Commission Management ────────────────────────────────────────────────
+    Route::get('/commissions', [Admin\CommissionReportController::class, 'index'])->name('commissions.index');
+    Route::get('/commissions/pdf', [Admin\CommissionReportController::class, 'downloadPdf'])->name('commissions.pdf');
+    Route::post('/commissions/mark-paid', [Admin\CommissionReportController::class, 'markAsPaid'])->name('commissions.mark-paid');
 });

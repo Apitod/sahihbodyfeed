@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 /**
@@ -37,6 +38,7 @@ class AgentController extends Controller
 
     /**
      * Display a paginated, filterable list of all agents.
+     * Also passes the hierarchy tree for the collapsible tree tab.
      */
     public function index(Request $request): View
     {
@@ -60,7 +62,18 @@ class AgentController extends Controller
         $agents   = $query->latest()->paginate(20)->withQueryString();
         $statuses = AgentStatus::cases();
 
-        return view('admin.agents.index', compact('agents', 'statuses'));
+        // Load root agents with 3 levels of downlines for the hierarchy tree tab.
+        $rootAgents = Agent::with([
+                'user',
+                'downlines.user',
+                'downlines.downlines.user',
+                'downlines.downlines.downlines.user',
+            ])
+            ->whereNull('upline_id')
+            ->orderBy('nama')
+            ->get();
+
+        return view('admin.agents.index', compact('agents', 'statuses', 'rootAgents'));
     }
 
     // ─── Show ─────────────────────────────────────────────────────────────────
@@ -108,20 +121,39 @@ class AgentController extends Controller
     /**
      * Persist a brand-new agent created by the admin.
      *
-     * Unlike the public registration flow, admin-created agents are immediately
-     * activated — no payment proof or transaction verification step required.
+     * Admin-created agents are immediately activated — no payment proof or
+     * transaction verification step is required.
+     *
+     * KTP photo is stored at storage/app/public/ktp/{timestamp}_{filename}.
      */
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'username'   => 'required|string|max:60|unique:users,username',
-            'password'   => 'required|string|min:8|confirmed',
-            'nama'       => 'required|string|max:120',
-            'phone'      => 'nullable|string|max:20',
-            'upline_id'  => 'nullable|exists:agents,id',
+            // ── User credentials ───────────────────────────────────────────────────
+            'username'          => 'required|string|max:60|unique:users,username',
+            'password'          => 'required|string|min:8|confirmed',
+            // ── Personal data ───────────────────────────────────────────────────────
+            'nama'              => 'required|string|max:120',
+            'no_telp'           => 'nullable|string|max:20|unique:agents,no_telp',
+            'alamat'            => 'nullable|string|max:500',
+            // ── KTP photo (image file, max 2 MB) ───────────────────────────────────
+            'foto_ktp'          => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            // ── Bank data ───────────────────────────────────────────────────────────
+            'bank_name'         => 'nullable|string|max:100',
+            'bank_account'      => 'nullable|string|max:30',
+            'bank_account_name' => 'nullable|string|max:100',
+            // ── Hierarchy ────────────────────────────────────────────────────────────
+            'upline_id'         => 'nullable|exists:agents,id',
         ]);
 
-        DB::transaction(function () use ($validated) {
+        // Handle KTP file upload.
+        $ktpPath = null;
+        if ($request->hasFile('foto_ktp')) {
+            $ktpPath = $request->file('foto_ktp')
+                ->storeAs('ktp', time() . '_' . $request->file('foto_ktp')->getClientOriginalName(), 'public');
+        }
+
+        DB::transaction(function () use ($validated, $ktpPath) {
             $user = User::create([
                 'username'  => $validated['username'],
                 'password'  => Hash::make($validated['password']),
@@ -132,16 +164,21 @@ class AgentController extends Controller
             $user->assignRole('agent');
 
             Agent::create([
-                'user_id'      => $user->id,
-                'nama'         => $validated['nama'],
-                'phone'        => $validated['phone'] ?? null,
-                'upline_id'    => $validated['upline_id'] ?? null,
-                'total_points' => 0,
-                'status'       => AgentStatus::Agent,
-                'joined_at'    => now(),
+                'user_id'           => $user->id,
+                'nama'              => $validated['nama'],
+                'no_telp'           => $validated['no_telp']           ?? null,
+                'alamat'            => $validated['alamat']            ?? null,
+                'foto_ktp'          => $ktpPath,
+                'bank_name'         => $validated['bank_name']         ?? null,
+                'bank_account'      => $validated['bank_account']      ?? null,
+                'bank_account_name' => $validated['bank_account_name'] ?? null,
+                'upline_id'         => $validated['upline_id']         ?? null,
+                'total_points'      => 0,
+                'status'            => AgentStatus::Agent,
+                'joined_at'         => now(),
             ]);
 
-            Log::info("Admin created new agent [{$validated['nama']}] with user [{$user->id}].");
+            Log::info("Admin created agent [{$validated['nama']}] with user [{$user->id}].");
         });
 
         return redirect()->route('admin.agents.index')
@@ -166,14 +203,25 @@ class AgentController extends Controller
 
     /**
      * Update an agent's profile data.
-     * Username/password changes are handled separately via the User model.
+     *
+     * If a new KTP photo is uploaded, the old file is deleted from disk first.
+     * Username and password changes go through the User model directly.
      */
     public function update(Request $request, Agent $agent): RedirectResponse
     {
         $validated = $request->validate([
-            'nama'      => 'required|string|max:120',
-            'phone'     => 'nullable|string|max:20',
-            'upline_id' => [
+            // ── Personal data ─────────────────────────────────────────────────────
+            'nama'              => 'required|string|max:120',
+            'no_telp'           => 'nullable|string|max:20|unique:agents,no_telp,' . $agent->id,
+            'alamat'            => 'nullable|string|max:500',
+            // ── KTP photo (optional on update) ───────────────────────────────────
+            'foto_ktp'          => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            // ── Bank data ───────────────────────────────────────────────────────────
+            'bank_name'         => 'nullable|string|max:100',
+            'bank_account'      => 'nullable|string|max:30',
+            'bank_account_name' => 'nullable|string|max:100',
+            // ── Hierarchy ────────────────────────────────────────────────────────────
+            'upline_id'         => [
                 'nullable',
                 'exists:agents,id',
                 // Prevent self-referencing.
@@ -184,6 +232,19 @@ class AgentController extends Controller
                 },
             ],
         ]);
+
+        // Handle KTP file replacement.
+        if ($request->hasFile('foto_ktp')) {
+            // Delete the old file from storage if it exists.
+            if ($agent->foto_ktp) {
+                Storage::disk('public')->delete($agent->foto_ktp);
+            }
+            $validated['foto_ktp'] = $request->file('foto_ktp')
+                ->storeAs('ktp', time() . '_' . $request->file('foto_ktp')->getClientOriginalName(), 'public');
+        } else {
+            // Do not overwrite existing path if no new file was uploaded.
+            unset($validated['foto_ktp']);
+        }
 
         $agent->update($validated);
 

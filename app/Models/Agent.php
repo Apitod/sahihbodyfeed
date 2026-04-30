@@ -13,9 +13,21 @@ class Agent extends Model
     // NOTE: Status thresholds are now canonical on AgentStatus enum via ->requiredPoints().
 
     protected $fillable = [
-        'nama',
-        'phone',
+        // ── Core identity ─────────────────────────────────────────────────
         'user_id',
+        'nama',
+        'no_telp',
+        'alamat',
+
+        // ── KTP document ──────────────────────────────────────────────────
+        'foto_ktp',
+
+        // ── Bank payout data ──────────────────────────────────────────────
+        'bank_name',
+        'bank_account',
+        'bank_account_name',
+
+        // ── Hierarchy & gamification ──────────────────────────────────────
         'upline_id',
         'referral_code',
         'total_points',

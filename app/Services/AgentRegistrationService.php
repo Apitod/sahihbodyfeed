@@ -10,9 +10,11 @@ use App\Exceptions\InvalidTransactionStateException;
 use App\Models\Agent;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Notifications\NewTransactionNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 /**
  * AgentRegistrationService
@@ -74,7 +76,7 @@ class AgentRegistrationService
             $agent = Agent::create([
                 'user_id'      => $user->id,
                 'nama'         => $data['nama'],
-                'phone'        => $data['phone'] ?? null,
+                'no_telp'      => $data['no_telp'] ?? $data['phone'] ?? null, // support both key names during transition
                 'upline_id'    => $data['referral_agent_id'] ?? null,
                 'total_points' => 0,
                 'status'       => AgentStatus::Agent,
@@ -91,6 +93,10 @@ class AgentRegistrationService
             ]);
 
             Log::info("AgentRegistration: New registration submitted — User[{$user->id}] Agent[{$agent->id}] Transaction[{$transaction->id}].");
+
+            // Notify all admins.
+            $admins = User::where('role', UserRole::Admin)->get();
+            Notification::send($admins, new NewTransactionNotification($transaction));
 
             return $transaction;
         });

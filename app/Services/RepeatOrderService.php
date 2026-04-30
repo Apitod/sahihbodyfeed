@@ -8,8 +8,11 @@ use App\Exceptions\InvalidTransactionStateException;
 use App\Models\Agent;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Enums\UserRole;
+use App\Notifications\NewTransactionNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 /**
  * RepeatOrderService
@@ -55,6 +58,10 @@ class RepeatOrderService
             ]);
 
             Log::info("RepeatOrder: Submitted — Agent[{$agent->id}] Transaction[{$transaction->id}].");
+
+            // Notify all admins.
+            $admins = User::where('role', UserRole::Admin)->get();
+            Notification::send($admins, new NewTransactionNotification($transaction));
 
             return $transaction;
         });

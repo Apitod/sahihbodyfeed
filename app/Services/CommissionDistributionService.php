@@ -8,6 +8,7 @@ use App\Enums\TransactionType;
 use App\Models\Agent;
 use App\Models\Commission;
 use App\Models\Transaction;
+use App\Notifications\CommissionReceivedNotification;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -65,13 +66,18 @@ class CommissionDistributionService
                     'amount'           => $amount,
                     'generation_level' => $generation,
                     'type'             => $commissionType,
-                    'status'           => CommissionStatus::Paid, // Immediately marked as paid.
-                    'paid_at'          => now(),
+                    'status'           => CommissionStatus::Menunggu, // Waiting — cron will process at 01:00 WITA.
+                    'paid_at'          => null,                        // Set only after admin confirms disbursement.
                 ]);
 
                 $commissions[] = $commission;
 
                 Log::info("CommissionDistribution: Created commission #{$commission->id} — Gen-{$generation} recipient Agent[{$upline->id}] amount Rp" . number_format($amount) . " for transaction #{$transaction->id}.");
+
+                // Notify the recipient agent.
+                if ($upline->user) {
+                    $upline->user->notify(new CommissionReceivedNotification($commission));
+                }
 
                 /*
                  * === DISBURSEMENT HOOK ===
