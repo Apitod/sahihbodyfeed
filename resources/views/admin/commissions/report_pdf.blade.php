@@ -19,7 +19,7 @@
 <body>
 
     <div class="header">
-        <h1>LAPORAN PENCAIRAN KOMISI AGEN</h1>
+        <h1>LAPORAN PENCAIRAN KOMISI AGEN ({{ strtoupper($statusLabel ?? 'PENDING') }})</h1>
         <p>PT. Sahihbodyfeed | Tanggal Cetak: {{ $date }} WITA</p>
     </div>
 

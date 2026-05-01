@@ -35,26 +35,33 @@ class CommissionReportController extends Controller
     }
 
     /**
-     * Generate and download a PDF report of all currently "pending" commissions.
+     * Generate and download a PDF report of commissions based on status.
      */
-    public function downloadPdf()
+    public function downloadPdf(Request $request)
     {
-        $commissions = Commission::with(['recipient.user'])
-            ->where('status', CommissionStatus::Pending)
-            ->orderBy('recipient_id')
-            ->get();
+        $status = $request->input('status');
+
+        $query = Commission::with(['recipient.user'])->orderBy('recipient_id');
+        
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $commissions = $query->get();
 
         if ($commissions->isEmpty()) {
-            return back()->with('error', 'Tidak ada komisi berstatus pending untuk dicetak.');
+            return back()->with('error', 'Tidak ada komisi untuk dicetak pada status ini.');
         }
 
         // Group by recipient for the report
         $grouped = $commissions->groupBy('recipient_id');
         $date = now()->timezone('Asia/Makassar')->format('d M Y H:i');
-
-        $pdf = Pdf::loadView('admin.commissions.report_pdf', compact('grouped', 'date'));
         
-        return $pdf->download('laporan_komisi_pending_' . now()->format('Ymd') . '.pdf');
+        $statusLabel = $status ? ucfirst($status) : 'Semua';
+
+        $pdf = Pdf::loadView('admin.commissions.report_pdf', compact('grouped', 'date', 'statusLabel'));
+        
+        return $pdf->download('laporan_komisi_' . strtolower($statusLabel) . '_' . now()->format('Ymd') . '.pdf');
     }
 
     /**

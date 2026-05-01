@@ -6,8 +6,14 @@
 <div class="row row-cards">
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Verifikasi Klaim Reward (Pencairan)</h3>
+            <div class="card-header d-flex align-items-center">
+                <h3 class="card-title mb-0">Verifikasi Klaim Reward (Pencairan)</h3>
+                <div class="ms-auto">
+                    <button type="button" class="btn btn-secondary d-print-none" onclick="window.print()">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" /><path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" /><path d="M7 13m0 2a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2z" /></svg>
+                        Print
+                    </button>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table card-table table-vcenter text-nowrap datatable">
@@ -19,7 +25,7 @@
                             <th>Nilai Reward</th>
                             <th>Poin Agen Valid?</th>
                             <th>Status</th>
-                            <th>Aksi</th>
+                            <th class="d-print-none">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -46,7 +52,7 @@
                                     <span class="badge bg-red text-red-fg">{{ $claim->status->label() }}</span>
                                 @endif
                             </td>
-                            <td>
+                            <td class="d-print-none">
                                 @if($claim->status->value === 'pending')
                                 <div class="d-flex gap-2">
                                     <form action="{{ route('admin.rewards.approve', $claim->id) }}" method="POST">
