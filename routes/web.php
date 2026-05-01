@@ -7,7 +7,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    return view('home.index');
 });
 
 // Auth Routes (login only — self-registration has been removed; admins create agents)

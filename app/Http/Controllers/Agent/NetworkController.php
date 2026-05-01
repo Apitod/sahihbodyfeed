@@ -8,32 +8,61 @@ use Illuminate\Http\Request;
 
 class NetworkController extends Controller
 {
+    /**
+     * Maximum depth of tree to render (0 = root, 1 = gen1, etc.)
+     * Keeps it performant with large networks.
+     */
+    private const MAX_DEPTH = 3;
+
     public function index(Request $request)
     {
         $agent = $request->user()->agent;
-        $generations = [];
-        $this->collectGenerations($agent, 0, $generations);
 
-        return view('agent.network.index', compact('generations'));
+        // Build the nested tree starting from the logged-in agent
+        $tree = $this->buildTree($agent, 0);
+
+        // Count total unique descendants (all agents below root)
+        $totalTeam = $this->countDescendants($agent);
+
+        return view('agent.network.index', compact('tree', 'totalTeam'));
     }
 
-    private function collectGenerations($agent, $depth, &$generations)
+    /**
+     * Recursively builds a nested tree array for rendering.
+     */
+    private function buildTree(Agent $agent, int $depth): array
     {
-        if (!isset($generations[$depth])) {
-            $generations[$depth] = [];
-        }
-        
-        $generations[$depth][] = [
-            'id' => $agent->id,
-            'name' => $agent->nama,
-            'status' => $agent->status->label(),
-            'upline_id' => $agent->upline_id,
+        $node = [
+            'id'             => $agent->id,
+            'name'           => $agent->nama,
+            'status'         => $agent->status->label(),
+            'upline_id'      => $agent->upline_id,
             'downline_count' => $agent->downlines->count(),
+            'depth'          => $depth,
+            'children'       => [],
         ];
 
-        // Only go up to a certain depth if needed, but let's follow the tree
-        foreach ($agent->downlines as $downline) {
-            $this->collectGenerations($downline, $depth + 1, $generations);
+        if ($depth < self::MAX_DEPTH) {
+            // Load downlines eager to avoid N+1
+            $agent->load('downlines');
+            foreach ($agent->downlines as $downline) {
+                $node['children'][] = $this->buildTree($downline, $depth + 1);
+            }
         }
+
+        return $node;
+    }
+
+    /**
+     * Count all descendants recursively for the total team badge.
+     */
+    private function countDescendants(Agent $agent): int
+    {
+        $count = 0;
+        $agent->load('downlines');
+        foreach ($agent->downlines as $downline) {
+            $count += 1 + $this->countDescendants($downline);
+        }
+        return $count;
     }
 }

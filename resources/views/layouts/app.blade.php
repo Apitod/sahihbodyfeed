@@ -10,47 +10,111 @@
         @import url('https://rsms.me/inter/inter.css');
         :root {
             --tblr-font-sans-serif: 'Inter var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
-            --brand-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --brand-1: #FCE7C8; /* Cream */
+            --brand-2: #B1C29E; /* Sage Green */
+            --brand-3: #FADA7A; /* Mustard Yellow */
+            --brand-4: #F0A04B; /* Orange */
+            
+            /* Override Tabler / Bootstrap Primary */
+            --tblr-primary: var(--brand-4);
+            --tblr-primary-rgb: 240, 160, 75;
+            --accent: var(--brand-4);
+            
+            --brand-gradient: linear-gradient(135deg, var(--brand-4) 0%, #d48a3a 100%);
             --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
         }
-        body { font-feature-settings: "cv03", "cv04", "cv11"; }
+
+        .bg-primary { background-color: var(--brand-4) !important; }
+        .text-primary { color: var(--brand-4) !important; }
+        body { font-feature-settings: "cv03", "cv04", "cv11"; background-color: #fcfcfc; }
         .navbar-brand-autodark { font-weight: 800; letter-spacing: -0.02em; }
-        .card { border: none; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); border-radius: 12px; }
-        .btn-primary { background: var(--accent-gradient); border: none; border-radius: 8px; font-weight: 600; }
+        .card { border: none; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05); border-radius: 12px; }
+        .btn-primary { 
+            background-color: var(--brand-4) !important; 
+            border-color: var(--brand-4) !important;
+            color: #fff !important;
+            border-radius: 8px; font-weight: 600;
+        }
+        .btn-outline-primary {
+            color: var(--brand-4) !important;
+            border-color: var(--brand-4) !important;
+        }
+        .btn-outline-primary:hover {
+            background-color: var(--brand-4) !important;
+            color: #fff !important;
+        }
         .badge { border-radius: 6px; padding: 0.35em 0.65em; font-weight: 600; }
-        .navbar-vertical .nav-link { color: rgba(255, 255, 255, 0.7); font-weight: 500; }
-        .navbar-vertical .nav-link:hover, .navbar-vertical .nav-link.active { color: #ffffff !important; }
-        .navbar-vertical .nav-link-icon { color: rgba(255, 255, 255, 0.5) !important; }
-        .navbar-vertical .nav-link:hover .nav-link-icon, .navbar-vertical .nav-link.active .nav-link-icon { color: #ffffff !important; }
-        .navbar-vertical .dropdown-item { color: rgba(255, 255, 255, 0.7) !important; }
-        .navbar-vertical .dropdown-item:hover { background: rgba(255, 255, 255, 0.1); color: #ffffff !important; }
-        .navbar-vertical .dropdown-toggle:after { filter: brightness(0) invert(1); opacity: 0.5; }
+        
+        /* Custom Sidebar Styling */
+        .navbar-vertical {
+            background-color: var(--brand-2) !important;
+            border-right: 1px solid rgba(0,0,0,0.05) !important;
+        }
+        .navbar-vertical .nav-link { 
+            color: rgba(255, 255, 255, 0.85) !important; 
+            font-weight: 600; 
+            border-radius: 8px;
+            margin: 2px 12px;
+            padding: 10px 12px;
+        }
+        .navbar-vertical .nav-link:hover { 
+            background: rgba(255, 255, 255, 0.1); 
+            color: #ffffff !important; 
+        }
+        .navbar-vertical .nav-link.active { 
+            background: var(--brand-4) !important; 
+            color: #ffffff !important; 
+            box-shadow: 0 4px 12px rgba(240, 160, 75, 0.3);
+        }
+        .navbar-vertical .nav-link-icon { 
+            color: rgba(255, 255, 255, 0.6) !important; 
+        }
+        .navbar-vertical .nav-link:hover .nav-link-icon, 
+        .navbar-vertical .nav-link.active .nav-link-icon { 
+            color: #ffffff !important; 
+        }
+        .navbar-vertical .dropdown-item { 
+            color: rgba(255, 255, 255, 0.8) !important; 
+            font-weight: 500;
+        }
+        .navbar-vertical .dropdown-item:hover { 
+            background: rgba(255, 255, 255, 0.1); 
+            color: #ffffff !important; 
+        }
+        .navbar-vertical .dropdown-toggle:after { 
+            filter: brightness(0) invert(1); 
+        }
+        .navbar-brand-autodark {
+            filter: none !important;
+        }
     </style>
 </head>
 <body class="d-flex flex-column">
     <div class="page">
         <!-- Vertical Navbar (Sidebar) -->
         @auth
-        <aside class="navbar navbar-vertical navbar-expand-lg navbar-dark bg-dark">
+        <aside class="navbar navbar-vertical navbar-expand-lg navbar-dark border-end shadow-sm">
             <div class="container-fluid">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <h1 class="navbar-brand navbar-brand-autodark px-2 py-4">
-                    <a href="/" class="text-white text-decoration-none">SAHIHBODYFEED</a>
+                <h1 class="navbar-brand px-2 py-4">
+                    <a href="/" class="text-white text-decoration-none fw-bold" style="letter-spacing: 0.05em; font-size: 1.25rem;">
+                        <i class="ti ti-leaf me-1"></i> SAHIHBODYFEED
+                    </a>
                 </h1>
                 
                 <div class="navbar-nav flex-row d-lg-none">
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown">
-                            <span class="avatar avatar-sm bg-blue-lt">{{ substr(auth()->user()->username, 0, 2) }}</span>
+                            <span class="avatar avatar-sm rounded-pill" style="background: var(--brand-4); color: white;">{{ substr(auth()->user()->username, 0, 2) }}</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                             <a href="{{ route('profile') }}" class="dropdown-item">Profil Saya</a>
                             <div class="dropdown-divider"></div>
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
-                                <button type="submit" class="dropdown-item text-danger">Logout</button>
+                                <button type="submit" class="dropdown-item text-danger fw-bold">Logout</button>
                             </form>
                         </div>
                     </div>
@@ -70,69 +134,33 @@
         <div class="page-wrapper">
             <!-- Header for user info -->
             @auth
-            <header class="navbar navbar-expand-md navbar-light d-none d-lg-flex d-print-none bg-white border-bottom py-2">
+            <header class="navbar navbar-expand-md d-none d-lg-flex d-print-none border-bottom py-2" style="background-color: var(--brand-1); border-color: rgba(0,0,0,0.05) !important;">
                 <div class="container-fluid">
-                    <div class="navbar-nav ms-auto flex-row align-items-center gap-3">
-                        {{-- Notifications Dropdown --}}
-                        <div class="nav-item dropdown d-none d-md-flex me-3">
-                            <a href="#" class="nav-link px-0" data-bs-toggle="dropdown" tabindex="-1" aria-label="Show notifications">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /></svg>
-                                @if(auth()->user()->unreadNotifications->count() > 0)
-                                    <span class="badge bg-red badge-blink"></span>
-                                @endif
+                    <div class="ms-auto d-flex align-items-center gap-3">
+                        <div class="d-none d-md-flex">
+                            <a href="?theme=dark" class="nav-link px-0 hide-theme-dark" title="Enable dark mode" data-bs-toggle="tooltip"
+                               data-bs-placement="bottom">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" /></svg>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card" style="width: 320px; max-height: 400px; overflow-y: auto;">
-                                <div class="card border-0">
-                                    <div class="card-header border-0 pb-2">
-                                        <h3 class="card-title">Notifikasi</h3>
-                                    </div>
-                                    <div class="list-group list-group-flush list-group-hoverable">
-                                        @forelse(auth()->user()->notifications()->limit(5)->get() as $notification)
-                                            <div class="list-group-item">
-                                                <div class="row align-items-center">
-                                                    <div class="col-auto">
-                                                        @if(!$notification->read_at)
-                                                            <span class="status-dot status-dot-animated bg-red d-block"></span>
-                                                        @else
-                                                            <span class="status-dot bg-secondary d-block"></span>
-                                                        @endif
-                                                    </div>
-                                                    <div class="col text-truncate">
-                                                        <a href="{{ $notification->data['url'] ?? '#' }}" class="text-body d-block text-truncate fw-semibold">
-                                                            {{ $notification->data['type_label'] ?? 'Pemberitahuan' }}
-                                                        </a>
-                                                        <div class="d-block text-muted text-truncate mt-n1" style="font-size: 0.8rem;">
-                                                            {{ $notification->data['message'] ?? '' }}
-                                                        </div>
-                                                        <div class="d-block text-muted mt-1" style="font-size: 0.75rem;">
-                                                            {{ $notification->created_at->diffForHumans() }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @empty
-                                            <div class="p-3 text-center text-muted small">Belum ada notifikasi.</div>
-                                        @endforelse
-                                    </div>
-                                </div>
-                            </div>
+                            <a href="?theme=light" class="nav-link px-0 hide-theme-light" title="Enable light mode" data-bs-toggle="tooltip"
+                               data-bs-placement="bottom">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" /></svg>
+                            </a>
                         </div>
-
-                        {{-- User Dropdown --}}
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown">
-                                <span class="avatar avatar-sm bg-blue-lt">{{ substr(auth()->user()->username, 0, 2) }}</span>
+                                <span class="avatar avatar-sm rounded-pill shadow-sm" style="background: var(--brand-4); color: white;">{{ substr(auth()->user()->username, 0, 2) }}</span>
                                 <div class="d-none d-xl-block ps-2">
-                                    <div class="font-weight-bold">{{ auth()->user()->username }}</div>
-                                    <div class="mt-1 small text-secondary">{{ auth()->user()->role->label() }}</div>
+                                    <div class="fw-bold" style="color: #1e293b;">{{ auth()->user()->username }}</div>
+                                    <div class="mt-1 small text-muted text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.05em;">{{ auth()->user()->role->label() }}</div>
                                 </div>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                <a href="{{ route('profile') }}" class="dropdown-item">Profil Saya</a>
+                                <a href="{{ route('profile') }}" class="dropdown-item">Pengaturan Profil</a>
                                 <div class="dropdown-divider"></div>
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="dropdown-item text-danger">Logout</button>
+                                    <button type="submit" class="dropdown-item text-danger fw-bold">Logout</button>
                                 </form>
                             </div>
                         </div>
@@ -190,6 +218,28 @@
                     @yield('content')
                 </div>
             </div>
+
+            <footer class="footer footer-transparent d-print-none py-4 border-top mt-auto" style="background-color: var(--brand-1); border-color: rgba(0,0,0,0.05) !important;">
+                <div class="container-xl">
+                    <div class="row text-center align-items-center flex-row-reverse">
+                        <div class="col-lg-auto ms-lg-auto">
+                            <ul class="list-inline list-inline-dots mb-0">
+                                <li class="list-inline-item"><a href="#" class="link-secondary">Dokumentasi</a></li>
+                                <li class="list-inline-item"><a href="#" class="link-secondary">Bantuan</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-12 col-lg-auto mt-3 mt-lg-0">
+                            <ul class="list-inline list-inline-dots mb-0">
+                                <li class="list-inline-item">
+                                    Copyright &copy; {{ date('Y') }}
+                                    <a href="." class="link-secondary fw-bold" style="color: var(--brand-4) !important;">Sahihbodyfeed</a>.
+                                    Semua hak dilindungi.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
     </div>
     <!-- Core JS -->

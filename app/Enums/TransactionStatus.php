@@ -16,4 +16,13 @@ enum TransactionStatus: string
             self::Rejected => 'Ditolak',
         };
     }
+
+    public function badgeColor(): string
+    {
+        return match($this) {
+            self::Pending  => 'bg-warning-lt',
+            self::Verified => 'bg-success-lt',
+            self::Rejected => 'bg-danger-lt',
+        };
+    }
 }

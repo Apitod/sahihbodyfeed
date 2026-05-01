@@ -4,186 +4,325 @@
 
 @section('content')
 
-<div class="page-header d-print-none">
+<div class="page-header d-print-none mb-4">
     <div class="row align-items-center">
         <div class="col">
-            <h2 class="page-title text-primary font-weight-bold">Hierarki Jaringan</h2>
-            <div class="text-muted small mt-1">Kelola dan pantau struktur perkembangan tim Anda per generasi dalam tampilan interaktif.</div>
+            <h2 class="page-title text-primary fw-bold">Hierarki Jaringan</h2>
+            <div class="text-muted small mt-1">Klik pada card agen untuk melihat jaringan nya.</div>
+        </div>
+        <div class="col-auto">
+            <span class="badge bg-blue-lt px-3 py-2 rounded-pill fs-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="me-1"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                {{ $totalTeam }} Total Tim
+            </span>
         </div>
     </div>
 </div>
 
-<div class="row row-cards" x-data="{ 
-    collapsed: {},
-    limits: {},
-    toggleGen(depth) {
-        this.collapsed[depth] = !this.collapsed[depth];
-    },
-    isCollapsed(depth) {
-        return !!this.collapsed[depth];
-    },
-    getLimit(depth) {
-        return this.limits[depth] || 5;
-    },
-    showMore(depth) {
-        this.limits[depth] = (this.limits[depth] || 5) + 5;
-    }
-}">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm overflow-hidden">
-            <div class="card-header bg-white py-3 border-bottom-0">
-                <div class="d-flex align-items-center w-100">
-                    <h3 class="card-title m-0">Diagram Jaringan Aktif</h3>
-                    <div class="ms-auto">
-                        <span class="badge bg-blue-lt px-3 py-2 rounded-pill">
-                            <i class="ti ti-users me-1"></i> {{ collect($generations)->flatten(1)->count() }} Total Tim
-                        </span>
-                    </div>
-                </div>
+{{-- ─── Tree Container ────────────────────────────────────────────────────── --}}
+<div class="card border-0 shadow-sm overflow-hidden">
+<div class="card border-0 shadow-sm overflow-hidden">
+    <div class="card-header bg-white py-3">
+        <div class="d-flex align-items-center w-100 flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-2">
+                <div class="legend-dot" style="background:#F0A04B;"></div><span class="small text-muted">Anda</span>
+                <div class="legend-dot ms-3" style="background:#B1C29E;"></div><span class="small text-muted">Gen 1</span>
+                <div class="legend-dot ms-3" style="background:#FADA7A;"></div><span class="small text-muted">Gen 2</span>
+                <div class="legend-dot ms-3" style="background:#FCE7C8; border: 1px solid #e2e8f0;"></div><span class="small text-muted">Gen 3</span>
             </div>
-            <div class="card-body p-4 bg-light-subtle">
-                <div class="d-flex overflow-auto pb-4 network-wrapper" style="min-height: 500px; gap: 2.5rem;">
-                    @foreach($generations as $depth => $agents)
-                        <div class="flex-shrink-0 transition-all duration-300" 
-                             :style="isCollapsed({{ $depth }}) ? 'width: 40px' : 'width: 280px'">
-                            
-                            <!-- Generation Header -->
-                            <div class="sticky-top bg-transparent" style="z-index: 10;">
-                                <div class="rounded-3 shadow-sm d-flex align-items-center transition-all duration-300 overflow-hidden"
-                                     :class="isCollapsed({{ $depth }}) ? 'bg-secondary text-white justify-content-center' : 'bg-white border text-dark p-2 justify-content-between'"
-                                     @click="toggleGen({{ $depth }})" 
-                                     style="cursor: pointer; height: 48px;">
-                                    
-                                    <template x-if="!isCollapsed({{ $depth }})">
-                                        <div class="d-flex align-items-center w-100">
-                                            <div class="gen-indicator me-2 rounded-circle" 
-                                                 style="width: 10px; height: 10px; background: {{ $depth == 0 ? '#3b82f6' : ($depth % 2 == 0 ? '#10b981' : '#f59e0b') }}; flex-shrink: 0;">
-                                            </div>
-                                            <span class="fw-bold text-nowrap flex-grow-1">
-                                                {{ $depth == 0 ? 'Sponsor' : 'Gen ' . $depth }}
-                                            </span>
-                                            <span class="badge bg-light text-dark rounded-pill border me-2 small">{{ count($agents) }}</span>
-                                            <i class="ti ti-chevron-left fs-4"></i>
-                                        </div>
-                                    </template>
-
-                                    <template x-if="isCollapsed({{ $depth }})">
-                                        <div class="d-flex flex-column align-items-center">
-                                            <span class="fw-bold small mb-n1">{{ $depth }}</span>
-                                            <i class="ti ti-chevron-right small"></i>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-
-                            <!-- Agent Cards -->
-                            <div class="d-flex flex-column gap-3 mt-4" x-show="!isCollapsed({{ $depth }})" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 transform -translate-x-4" x-transition:enter-end="opacity-100 transform translate-x-0">
-                                @foreach($agents as $index => $agent)
-                                    <div class="agent-card bg-white rounded-4 shadow-sm border p-3 position-relative overflow-hidden" 
-                                         x-show="{{ $index }} < getLimit({{ $depth }})"
-                                         data-bs-toggle="modal" data-bs-target="#modal-agent-detail" 
-                                         onclick="showDetail({{ json_encode($agent) }})"
-                                         style="cursor: pointer; transition: all 0.2s ease;">
-                                        
-                                        <div class="position-absolute top-0 start-0 h-100" style="width: 4px; background: {{ $depth == 0 ? '#3b82f6' : ($depth % 2 == 0 ? '#10b981' : '#f59e0b') }};"></div>
-                                        
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar avatar-md rounded-circle bg-light text-primary fw-bold me-3">
-                                                {{ substr($agent['name'], 0, 2) }}
-                                            </div>
-                                            <div class="overflow-hidden">
-                                                <div class="fw-bold text-dark text-truncate" title="{{ $agent['name'] }}">{{ $agent['name'] }}</div>
-                                                <div class="text-muted small d-flex align-items-center">
-                                                    <span class="badge bg-blue-lt py-0 px-1 me-1" style="font-size: 0.65rem;">{{ $agent['status'] }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        @if($agent['downline_count'] > 0)
-                                            <div class="mt-2 pt-2 border-top d-flex justify-content-between align-items-center">
-                                                <span class="text-muted small">Total Downline</span>
-                                                <span class="badge bg-light text-primary rounded-pill border">{{ $agent['downline_count'] }}</span>
-                                            </div>
-                                        @endif
-                                    </div>
-                                @endforeach
-
-                                @if(count($agents) > 5)
-                                    <div x-show="getLimit({{ $depth }}) < {{ count($agents) }}" class="text-center mt-2">
-                                        <button class="btn btn-sm btn-ghost-primary rounded-pill w-100 py-2 fw-bold" @click="showMore({{ $depth }})">
-                                            <i class="ti ti-plus me-1"></i> Tampilkan Lebih Banyak (<span x-text="{{ count($agents) }} - getLimit({{ $depth }})"></span> lagi)
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    @endforeach
+            
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <div class="text-muted small d-none d-md-block">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    Klik card untuk expand/collapse
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal Detail Agent -->
-<div class="modal modal-blur fade" id="modal-agent-detail" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-body text-center py-5">
-                <div class="avatar avatar-xl rounded-circle bg-blue-lt mb-4 shadow-sm" id="modal-avatar" style="width: 80px; height: 80px; font-size: 1.5rem;">??</div>
-                <h3 id="modal-name" class="mb-1 fw-bold">Nama Agen</h3>
-                <div class="badge bg-blue-lt px-3 mb-4" id="modal-status">Pangkat</div>
-                
-                <div class="row g-2 mt-2">
-                    <div class="col-12">
-                        <div class="p-3 bg-light rounded-4">
-                            <div class="text-muted small mb-1">Downline Langsung</div>
-                            <div id="modal-downline-count" class="h2 fw-bold mb-0 text-primary">0</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-light w-100 rounded-3" data-bs-dismiss="modal">Tutup</button>
-            </div>
+    <div class="card-body p-4" style="background: #f8fafc; overflow-x: auto;">
+        <div class="network-tree-wrapper">
+            @include('agent.network._node', ['node' => $tree, 'isRoot' => true])
         </div>
     </div>
 </div>
 
+{{-- Modal Detail Removed --}}
+
+{{-- ─── Styles ────────────────────────────────────────────────────────────── --}}
 <style>
-    .network-wrapper {
-        scrollbar-width: thin;
-        scrollbar-color: #cbd5e1 transparent;
-    }
-    .network-wrapper::-webkit-scrollbar {
-        height: 6px;
-    }
-    .network-wrapper::-webkit-scrollbar-thumb {
-        background-color: #cbd5e1;
-        border-radius: 10px;
-    }
-    .agent-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-        border-color: #3b82f6 !important;
-    }
-    .transition-all {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .ti {
-        vertical-align: middle;
-    }
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+.network-tree-wrapper {
+    display: inline-block;
+    min-width: 100%;
+    padding: 2rem 1rem;
+}
+
+/* ── Tree node ───────────────────────────────────────────────────────────── */
+.tree-node {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    position: relative;
+}
+
+/* ── Item (card + connector) ─────────────────────────────────────────────── */
+.tree-item {
+    display: flex;
+    align-items: center;
+    position: relative;
+    flex-shrink: 0;
+    z-index: 2;
+}
+
+/* ── Horizontal connector FROM parent card TO vertical rail ─────────────── */
+.tree-children {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-left: 48px; /* space for the horizontal arm */
+}
+
+/* Vertical rail that connects all siblings */
+.tree-children-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+}
+
+/* Smooth vertical rail */
+.tree-children-inner::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #cbd5e1;
+    z-index: 1;
+}
+
+/* Fix vertical rail top/bottom overshoot */
+.tree-children-inner > .tree-node:first-child::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 0;
+    height: 50%;
+    width: 2px;
+    background: #f8fafc; /* Match background to hide upper half of rail */
+    z-index: 2;
+}
+
+.tree-children-inner > .tree-node:last-child::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    bottom: 0;
+    height: calc(50% - 1px);
+    width: 2px;
+    background: #f8fafc; /* Match background to hide lower half of rail */
+    z-index: 2;
+}
+
+/* Horizontal arms from the vertical rail to each child card */
+.tree-children-inner > .tree-node::after {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 50%;
+    width: 24px;
+    height: 2px;
+    background: #cbd5e1;
+    z-index: 1;
+}
+
+/* ── Agent card ──────────────────────────────────────────────────────────── */
+.agent-node-card {
+    width: 230px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.agent-node-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    transform: translateY(-3px);
+}
+
+/* Left accent bar */
+.node-accent-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--accent);
+}
+
+/* Card content row */
+.node-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 12px 14px 16px;
+}
+
+/* Avatar */
+.node-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+/* Info */
+.node-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.node-name {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.node-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.node-status-badge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.node-gen-label {
+    font-size: 0.65rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+/* Toggle chevron */
+.node-toggle {
+    color: #cbd5e1;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.node-toggle--open {
+    transform: rotate(90deg);
+    color: var(--accent);
+}
+
+/* Footer downline count */
+.node-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px 8px 16px;
+    background: #fcfdfe;
+    border-top: 1px solid #f1f5f9;
+    font-size: 0.7rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.node-count-badge {
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 1px 8px;
+    border-radius: 20px;
+}
+
+/* ── Root node special styling ───────────────────────────────────────────── */
+.tree-root > .tree-item > .agent-node-card {
+    width: 250px;
+    border-width: 2px;
+    border-color: #3b82f633;
+}
+
+/* ── Horizontal arm FROM parent card TO children ───────────────────────────── */
+/* Horizontal connector line between parent card edge and vertical rail */
+.tree-item::after {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: #cbd5e1;
+    flex-shrink: 0;
+}
+
+.tree-item:not(.has-children)::after {
+    display: none;
+}
+
+/* ── Alpine.js transition classes ────────────────────────────────────────── */
+.tree-enter {
+    transition: all 0.3s ease-out;
+}
+.tree-enter-start {
+    opacity: 0;
+    transform: translateX(-15px);
+}
+.tree-enter-end {
+    opacity: 1;
+    transform: translateX(0);
+}
+.tree-leave {
+    transition: all 0.2s ease-in;
+}
+.tree-leave-start {
+    opacity: 1;
+    transform: translateX(0);
+}
+.tree-leave-end {
+    opacity: 0;
+    transform: translateX(-15px);
+}
+
+/* ── Legend dot ──────────────────────────────────────────────────────────── */
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
 </style>
+
 @endsection
 
 @section('scripts')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script>
-        function showDetail(agent) {
-            document.getElementById('modal-name').innerText = agent.name;
-            document.getElementById('modal-status').innerText = agent.status;
-            document.getElementById('modal-avatar').innerText = agent.name.substring(0, 2).toUpperCase();
-            document.getElementById('modal-downline-count').innerText = agent.downline_count;
-        }
-    </script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 @endsection
