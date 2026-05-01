@@ -56,12 +56,11 @@
                     @endif
                 </div>
 
-                {{-- ── Referral Code Card ──────────────────────────────── --}}
-                @if($agent->referral_code)
+                {{-- ── Referral Username Card ──────────────────────────────── --}}
                 <div class="mt-3 text-start border border-primary-subtle rounded-3 p-3 bg-primary-lt">
                     <div class="d-flex align-items-center mb-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon text-primary me-2" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-1.5 1.5" /><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l1.5 -1.5" /></svg>
-                        <strong class="small text-primary">Kode Referral Anda</strong>
+                        <strong class="small text-primary">Username Referral Anda</strong>
                     </div>
 
                     {{-- Copyable code --}}
@@ -70,21 +69,20 @@
                             id="referral-code-input"
                             type="text"
                             class="form-control font-monospace fw-bold text-center"
-                            value="{{ $agent->referral_code }}"
+                            value="{{ auth()->user()->username }}"
                             readonly
                         >
                         <button
                             class="btn btn-outline-primary"
                             type="button"
-                            onclick="copyToClipboard('{{ $agent->referral_code }}', this)"
-                            title="Salin kode"
+                            onclick="copyToClipboard('{{ auth()->user()->username }}', this)"
+                            title="Salin username"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" /><path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2" /></svg>
                         </button>
                     </div>
-                    <small class="text-muted mt-2 d-block">Bagikan kode atau link ini kepada calon agen baru.</small>
+                    <small class="text-muted mt-2 d-block">Bagikan username atau link ini kepada calon agen baru.</small>
                 </div>
-                @endif
                 @endif
             </div>
         </div>

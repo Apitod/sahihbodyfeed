@@ -29,44 +29,12 @@ class Agent extends Model
 
         // ── Hierarchy & gamification ──────────────────────────────────────
         'upline_id',
-        'referral_code',
         'total_points',
         'status',
         'joined_at',
     ];
 
-    // ─── Auto-generate referral_code ─────────────────────────────────────────
 
-    protected static function boot(): void
-    {
-        parent::boot();
-
-        // Automatically assign a unique referral code to every new agent.
-        static::creating(function (Agent $agent) {
-            if (empty($agent->referral_code)) {
-                $agent->referral_code = static::generateUniqueReferralCode();
-            }
-        });
-    }
-
-    /**
-     * Generate a unique referral code in the format "SBF" + 6 random uppercase
-     * alphanumeric characters (excluding ambiguous chars I, O, 0, 1).
-     * Retries until uniqueness is confirmed against the database.
-     */
-    public static function generateUniqueReferralCode(): string
-    {
-        $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-        do {
-            $suffix = '';
-            for ($i = 0; $i < 6; $i++) {
-                $suffix .= $chars[random_int(0, strlen($chars) - 1)];
-            }
-            $code = 'SBF' . $suffix;
-        } while (static::where('referral_code', $code)->exists());
-
-        return $code;
-    }
 
     protected function casts(): array
     {

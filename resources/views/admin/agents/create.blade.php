@@ -108,7 +108,7 @@
                             <option value="">— Tidak ada upline —</option>
                             @foreach($uplineAgents as $upline)
                                 <option value="{{ $upline->id }}" @selected(old('upline_id') == $upline->id)>
-                                    {{ $upline->nama }} ({{ $upline->referral_code }})
+                                    {{ $upline->nama }} ({{ $upline->user?->username ?? 'Tidak ada username' }})
                                 </option>
                             @endforeach
                         </select>

@@ -47,7 +47,7 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>
                         <strong>{{ $agent->nama }}</strong><br>
-                        <small style="color: #666;">ID: {{ $agent->referral_code }}</small>
+                        <small style="color: #666;">Username: {{ $agent->user?->username ?? '-' }}</small>
                     </td>
                     <td>{{ $agent->bank_name ?? '-' }}</td>
                     <td>

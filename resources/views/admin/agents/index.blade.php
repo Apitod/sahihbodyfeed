@@ -148,7 +148,7 @@
                 <div class="col-12 col-md-5">
                     <label class="form-label text-muted small mb-1">Cari Agen</label>
                     <input type="text" name="search" id="search-input" class="form-control"
-                        placeholder="Nama, username, atau kode referral…" value="{{ request('search') }}">
+                        placeholder="Nama atau username…" value="{{ request('search') }}">
                 </div>
                 <div class="col-12 col-md-3">
                     <label class="form-label text-muted small mb-1">Filter Status</label>
@@ -179,7 +179,6 @@
                     <tr>
                         <th class="text-muted small">#</th>
                         <th class="text-muted small">Nama / Username</th>
-                        <th class="text-muted small">Kode Referral</th>
                         <th class="text-muted small">Upline</th>
                         <th class="text-muted small">Status</th>
                         <th class="text-muted small">Pangkat</th>
@@ -203,7 +202,6 @@
                                 </div>
                             </div>
                         </td>
-                        <td><code class="text-secondary small">{{ $agent->referral_code }}</code></td>
                         <td class="text-secondary small">
                             {!! $agent->upline?->nama ?? '<span class="text-muted fst-italic">—</span>' !!}
                         </td>
@@ -268,7 +266,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="9" class="text-center text-muted py-4">Tidak ada agen yang ditemukan.</td>
+                        <td colspan="8" class="text-center text-muted py-4">Tidak ada agen yang ditemukan.</td>
                     </tr>
                     @endforelse
                 </tbody>

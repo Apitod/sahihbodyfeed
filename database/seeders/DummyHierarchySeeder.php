@@ -81,7 +81,7 @@ class DummyHierarchySeeder extends Seeder
                 'user_id'      => $user->id,
                 'nama'         => "Dummy Agent " . strtoupper($levelPrefix) . " " . strtoupper($uniqueStr),
                 'upline_id'    => $upline->id,
-                'phone'        => '08' . mt_rand(100000000, 999999999),
+                'no_telp'        => '08' . mt_rand(100000000, 999999999),
                 'total_points' => 0,
                 'status'       => AgentStatus::Agent,
                 'joined_at'    => now(),

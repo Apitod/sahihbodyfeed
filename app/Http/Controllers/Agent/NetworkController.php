@@ -11,23 +11,29 @@ class NetworkController extends Controller
     public function index(Request $request)
     {
         $agent = $request->user()->agent;
-        
-        // Fetch downline hierarchy (recursively or just next level)
-        // For a diagram, we'll fetch the tree starting from this agent
-        $network = $this->getDownlineData($agent);
+        $generations = [];
+        $this->collectGenerations($agent, 0, $generations);
 
-        return view('agent.network.index', compact('network'));
+        return view('agent.network.index', compact('generations'));
     }
 
-    private function getDownlineData(Agent $agent)
+    private function collectGenerations($agent, $depth, &$generations)
     {
-        return [
+        if (!isset($generations[$depth])) {
+            $generations[$depth] = [];
+        }
+        
+        $generations[$depth][] = [
             'id' => $agent->id,
             'name' => $agent->nama,
             'status' => $agent->status->label(),
-            'children' => $agent->downlines->map(function($downline) {
-                return $this->getDownlineData($downline);
-            })->toArray()
+            'upline_id' => $agent->upline_id,
+            'downline_count' => $agent->downlines->count(),
         ];
+
+        // Only go up to a certain depth if needed, but let's follow the tree
+        foreach ($agent->downlines as $downline) {
+            $this->collectGenerations($downline, $depth + 1, $generations);
+        }
     }
 }

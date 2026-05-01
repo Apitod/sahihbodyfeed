@@ -29,8 +29,8 @@ Route::middleware(['auth', 'role:agent'])->prefix('agent')->name('agent.')->grou
     Route::get('/dashboard', [Agent\DashboardController::class, 'index'])->name('dashboard');
     
     // Placeholders for sidebar implementation
-    Route::get('/transactions/create', [Agent\TransactionController::class, 'createRepeatOrder'])->name('repeat_order.create');
-    Route::post('/transactions', [Agent\TransactionController::class, 'storeRepeatOrder'])->name('repeat_order.store');
+    // Route::get('/transactions/create', [Agent\TransactionController::class, 'createRepeatOrder'])->name('repeat_order.create');
+    // Route::post('/transactions', [Agent\TransactionController::class, 'storeRepeatOrder'])->name('repeat_order.store');
     Route::get('/transactions', [Agent\TransactionController::class, 'index'])->name('transactions.index');
     Route::get('/commissions', [Agent\CommissionController::class, 'index'])->name('commissions');
     Route::get('/rewards', [Agent\RewardController::class, 'index'])->name('rewards');
@@ -45,6 +45,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     
     // Placeholders for sidebar implementation
     Route::get('/verifications/transactions', [Admin\VerificationController::class, 'transactionsList'])->name('verifications.transactions');
+    Route::get('/verifications/transactions/create-ro', [Admin\VerificationController::class, 'createRepeatOrder'])->name('verifications.ro.create');
+    Route::post('/verifications/transactions/create-ro', [Admin\VerificationController::class, 'storeRepeatOrder'])->name('verifications.ro.store');
     Route::post('/verifications/transactions/{transaction}/approve', [Admin\VerificationController::class, 'approveTransaction'])->name('transactions.approve');
     Route::post('/verifications/transactions/{transaction}/reject', [Admin\VerificationController::class, 'rejectTransaction'])->name('transactions.reject');
     Route::get('/verifications/rewards', [Admin\RewardVerificationController::class, 'index'])->name('verifications.rewards');

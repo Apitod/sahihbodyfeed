@@ -45,11 +45,10 @@ class AgentController extends Controller
         $query = Agent::with(['user', 'upline'])
             ->withCount('downlines');
 
-        // Search by name or referral code.
+        // Search by name or username.
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('referral_code', 'like', "%{$search}%")
                   ->orWhereHas('user', fn ($u) => $u->where('username', 'like', "%{$search}%"));
             });
         }
@@ -273,7 +272,9 @@ class AgentController extends Controller
         DB::transaction(function () use ($agent) {
             $userId = $agent->user_id;
             $agent->delete();
-            User::find($userId)?->delete();
+            if ($userId) {
+                User::where('id', $userId)->delete();
+            }
         });
 
         Log::warning("Admin deleted agent [{$nama}].");

@@ -49,9 +49,8 @@
                    onclick="event.stopPropagation()">{{ $agent->nama }}</a>
             </div>
             <div class="tree-meta">
-                <code class="small">{{ $agent->referral_code }}</code>
                 @if($agent->user?->username)
-                    &nbsp;·&nbsp; {{ $agent->user->username }}
+                    <code class="small">{{ $agent->user->username }}</code>
                 @endif
                 @if($hasKids)
                     &nbsp;·&nbsp; {{ $agent->downlines->count() }} downline

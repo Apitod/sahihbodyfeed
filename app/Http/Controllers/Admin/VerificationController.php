@@ -28,6 +28,55 @@ class VerificationController extends Controller
         return view('admin.verifications.transactions', compact('transactions'));
     }
 
+    /**
+     * Show form for admin to create a Repeat Order on behalf of an agent.
+     * Agent lookup is done by username.
+     */
+    public function createRepeatOrder(Request $request)
+    {
+        $amount = \App\Enums\TransactionType::RepeatOrder->amount();
+
+        // If a username is submitted, resolve the agent for preview
+        $agent = null;
+        if ($username = $request->input('username')) {
+            $agent = \App\Models\Agent::whereHas('user', fn ($q) => $q->where('username', $username))
+                ->with('user')
+                ->first();
+        }
+
+        return view('admin.verifications.create_ro', compact('amount', 'agent', 'username'));
+    }
+
+    /**
+     * Admin submits a Repeat Order transaction on behalf of an agent (found by username).
+     */
+    public function storeRepeatOrder(Request $request)
+    {
+        $validated = $request->validate([
+            'username'         => 'required|string|exists:users,username',
+            'proof_of_payment' => 'required|image|max:2048',
+        ]);
+
+        $agent = \App\Models\Agent::whereHas('user', fn ($q) => $q->where('username', $validated['username']))
+            ->with('user')
+            ->first();
+
+        if (! $agent) {
+            return back()->withErrors(['username' => 'Agen dengan username tersebut tidak ditemukan.'])->withInput();
+        }
+
+        if (! $agent->user?->is_active) {
+            return back()->withErrors(['username' => 'Akun agen ini tidak aktif.'])->withInput();
+        }
+
+        $path = $request->file('proof_of_payment')->store('payments', 'public');
+
+        $this->repeatOrderService->submitOrder($agent, $path);
+
+        return redirect()->route('admin.verifications.transactions')
+            ->with('success', "Repeat Order untuk agen '{$agent->nama}' (@{$agent->user->username}) berhasil dibuat dan menunggu verifikasi.");
+    }
+
     public function approveTransaction(Transaction $transaction, Request $request)
     {
         try {

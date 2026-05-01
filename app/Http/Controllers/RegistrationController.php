@@ -15,19 +15,12 @@ class RegistrationController extends Controller
 
     public function showRegistrationForm(Request $request)
     {
-        // Support referral links like /register?ref=SBFxxxxxx (referral_code)
-        // or legacy /register?ref=username.
+        // Support referral links like /register?ref=username.
         $referrer = null;
         if ($request->has('ref')) {
-            // 1. Try matching by referral_code (preferred).
-            $referrer = Agent::where('referral_code', $request->ref)->first();
-
-            // 2. Fallback: match by upline username (legacy URL format).
-            if (! $referrer) {
-                $referrer = Agent::whereHas('user', function ($q) use ($request) {
-                    $q->where('username', $request->ref);
-                })->first();
-            }
+            $referrer = Agent::whereHas('user', function ($q) use ($request) {
+                $q->where('username', $request->ref);
+            })->first();
         }
 
         return view('auth.register', compact('referrer'));
@@ -41,20 +34,23 @@ class RegistrationController extends Controller
             'username'          => 'required|string|max:100|unique:users,username',
             'password'          => 'required|string|min:6|confirmed',
             'referral_agent_id' => 'nullable|exists:agents,id',
-            // Manual referral code entry (when no pre-filled upline via URL).
-            'referral_code'     => 'nullable|string|max:20|exists:agents,referral_code',
+            // Manual username entry (when no pre-filled upline via URL).
+            'referral_username' => 'nullable|string|exists:users,username',
             'proof_of_payment'  => 'required|image|max:2048', // 2MB max for proof
         ]);
 
-        // Resolve referral_code → referral_agent_id (if code was typed manually
+        // Resolve referral_username → referral_agent_id (if username was typed manually
         // and no hidden referral_agent_id was pre-filled via ?ref= URL).
-        if (! empty($validated['referral_code']) && empty($validated['referral_agent_id'])) {
-            $referrerByCode = Agent::where('referral_code', $validated['referral_code'])->first();
-            if ($referrerByCode) {
-                $validated['referral_agent_id'] = $referrerByCode->id;
+        if (! empty($validated['referral_username']) && empty($validated['referral_agent_id'])) {
+            $referrerByUsername = Agent::whereHas('user', function ($q) use ($validated) {
+                $q->where('username', $validated['referral_username']);
+            })->first();
+            
+            if ($referrerByUsername) {
+                $validated['referral_agent_id'] = $referrerByUsername->id;
             }
         }
-        unset($validated['referral_code']); // Not used by the service directly.
+        unset($validated['referral_username']); // Not used by the service directly.
 
         // Handle file upload
         if ($request->hasFile('proof_of_payment')) {

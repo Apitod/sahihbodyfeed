@@ -43,19 +43,15 @@
             </div>
             <div class="card-body">
                 <div class="row g-2">
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-4">
                         <div class="text-muted small">Username</div>
                         <div class="fw-semibold">{{ $agent->user?->username ?? '—' }}</div>
                     </div>
-                    <div class="col-6 col-md-3">
-                        <div class="text-muted small">Kode Referral</div>
-                        <code>{{ $agent->referral_code }}</code>
-                    </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-4">
                         <div class="text-muted small">Pangkat</div>
                         <span class="badge bg-blue-lt text-blue">{{ $agent->status->label() }}</span>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-4">
                         <div class="text-muted small">Total Poin</div>
                         <div class="fw-semibold">{{ number_format($agent->total_points) }}</div>
                     </div>
@@ -101,7 +97,7 @@
                             @foreach($uplineAgents as $upline)
                                 <option value="{{ $upline->id }}"
                                     @selected(old('upline_id', $agent->upline_id) == $upline->id)>
-                                    {{ $upline->nama }} ({{ $upline->referral_code }})
+                                    {{ $upline->nama }} ({{ $upline->user?->username ?? 'Tidak ada username' }})
                                 </option>
                             @endforeach
                         </select>

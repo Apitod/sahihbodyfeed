@@ -46,9 +46,8 @@ class UserSeeder extends Seeder
             ['user_id' => $rootAgentUser->id],
             [
                 'nama'          => 'Agen Utama Sahih',
-                'referral_code' => 'SBFROOT01', // Fixed code for the root/seed agent.
                 'upline_id'     => null,         // Root agent, no upline.
-                'phone'         => '08123456789',
+                'no_telp'         => '08123456789',
                 'total_points'  => 0,
                 'status'        => AgentStatus::Agent,
                 'joined_at'     => now(),

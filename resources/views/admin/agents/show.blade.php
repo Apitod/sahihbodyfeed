@@ -98,11 +98,12 @@
 
                     <div class="hr-text">Info</div>
                     <dl class="row text-start g-1 small mt-2">
-                        <dt class="col-6 text-muted">Kode Referral</dt>
-                        <dd class="col-6"><code>{{ $agent->referral_code }}</code></dd>
 
                         <dt class="col-6 text-muted">Telepon</dt>
-                        <dd class="col-6">{{ $agent->phone ?? '—' }}</dd>
+                        <dd class="col-6">{{ $agent->no_telp ?? $agent->phone ?? '—' }}</dd>
+
+                        <dt class="col-6 text-muted">Alamat</dt>
+                        <dd class="col-6">{{ $agent->alamat ?? '—' }}</dd>
 
                         <dt class="col-6 text-muted">Upline</dt>
                         <dd class="col-6">
@@ -121,6 +122,28 @@
                         <dt class="col-6 text-muted">Bergabung</dt>
                         <dd class="col-6">{{ $agent->joined_at?->format('d M Y') ?? '—' }}</dd>
                     </dl>
+
+                    <div class="hr-text mt-3 mb-2">Data Rekening</div>
+                    <dl class="row text-start g-1 small">
+                        <dt class="col-6 text-muted">Bank</dt>
+                        <dd class="col-6">{{ $agent->bank_name ?? '—' }}</dd>
+
+                        <dt class="col-6 text-muted">No. Rekening</dt>
+                        <dd class="col-6">{{ $agent->bank_account ?? '—' }}</dd>
+
+                        <dt class="col-6 text-muted">Atas Nama</dt>
+                        <dd class="col-6">{{ $agent->bank_account_name ?? '—' }}</dd>
+                    </dl>
+
+                    @if($agent->foto_ktp)
+                        <div class="hr-text mt-3 mb-2">Dokumen</div>
+                        <div class="text-start">
+                            <div class="text-muted small mb-1">Foto KTP</div>
+                            <a href="{{ asset('storage/' . $agent->foto_ktp) }}" target="_blank">
+                                <img src="{{ asset('storage/' . $agent->foto_ktp) }}" alt="KTP {{ $agent->nama }}" class="img-fluid rounded border" style="max-height: 120px; object-fit: cover;">
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -215,7 +238,6 @@
                 <thead>
                     <tr>
                         <th class="text-muted small">Nama</th>
-                        <th class="text-muted small">Kode Referral</th>
                         <th class="text-muted small">Pangkat</th>
                         <th class="text-muted small">Status</th>
                         <th class="text-muted small text-center">Sub-Downline</th>
@@ -237,7 +259,6 @@
                                     </div>
                                 </div>
                             </td>
-                            <td><code class="text-secondary small">{{ $dl->referral_code }}</code></td>
                             <td>
                                 <span class="badge bg-secondary-lt text-secondary">{{ $dl->status->label() }}</span>
                             </td>
@@ -258,7 +279,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4">Belum ada downline terdaftar.</td>
+                            <td colspan="6" class="text-center text-muted py-4">Belum ada downline terdaftar.</td>
                         </tr>
                     @endforelse
                 </tbody>
