@@ -188,6 +188,49 @@
             border-radius: 12px;
             margin-bottom: 24px;
         }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .login-container {
+                flex-direction: column;
+                height: auto;
+                width: 500px;
+                max-width: 90vw;
+            }
+            .login-visual {
+                padding: 40px;
+                min-height: 300px;
+            }
+            .login-form-side {
+                width: 100%;
+                padding: 40px;
+            }
+            .welcome-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .login-visual {
+                display: none;
+            }
+            .login-container {
+                width: 100%;
+                max-width: 100%;
+                border-radius: 0;
+                box-shadow: none;
+                height: 100vh;
+            }
+            .login-form-side {
+                height: 100%;
+                padding: 30px;
+            }
+            body {
+                background: #fff;
+                height: auto;
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 <body>

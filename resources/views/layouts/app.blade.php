@@ -73,19 +73,41 @@
         .navbar-vertical .nav-link.active .nav-link-icon { 
             color: #ffffff !important; 
         }
+        /* Fix: Only target items in the sidebar, not in actual dropdown menus */
         .navbar-vertical .dropdown-item { 
-            color: rgba(255, 255, 255, 0.8) !important; 
+            color: #1e293b !important; /* Dark text for dropdown items */
             font-weight: 500;
         }
         .navbar-vertical .dropdown-item:hover { 
-            background: rgba(255, 255, 255, 0.1); 
-            color: #ffffff !important; 
+            background: rgba(0, 0, 0, 0.05) !important; 
+            color: var(--brand-4) !important; 
         }
         .navbar-vertical .dropdown-toggle:after { 
             filter: brightness(0) invert(1); 
         }
         .navbar-brand-autodark {
             filter: none !important;
+        }
+
+        /* Mobile Sidebar Fix */
+        @media (max-width: 991.98px) {
+            .navbar-vertical.navbar-expand-lg {
+                background-color: var(--brand-2) !important;
+                z-index: 1050 !important;
+            }
+            .navbar-collapse {
+                background-color: var(--brand-2) !important;
+                margin: 12px;
+                border-radius: 20px;
+                padding: 1.5rem;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                z-index: 1060 !important;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
         }
     </style>
 </head>

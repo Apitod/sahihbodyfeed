@@ -125,13 +125,6 @@
             Daftar Agen
         </button>
     </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="tab-tree-btn" data-bs-toggle="tab" data-bs-target="#tab-tree"
-            type="button" role="tab" aria-controls="tab-tree" aria-selected="false">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6h10"/><path d="M12 12h7"/><path d="M15 18h4"/><path d="M5 6v.01"/><path d="M8 12v.01"/><path d="M5 6l3 6"/><path d="M5 18v-12"/></svg>
-            Hierarki Agen
-        </button>
-    </li>
 </ul>
 
 <div class="tab-content">
@@ -226,7 +219,30 @@
                         <td class="text-center text-muted small">{{ $agent->downlines_count }}</td>
                         <td class="text-muted small">{{ $agent->joined_at?->format('d M Y') ?? '—' }}</td>
                         <td class="text-end">
-                            <div class="d-flex gap-1 justify-content-end flex-wrap">
+                            <div class="dropdown d-md-none">
+                                <button class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown">Aksi</button>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <a href="{{ route('admin.agents.show', $agent) }}" class="dropdown-item">Detail</a>
+                                    <a href="{{ route('admin.agents.edit', $agent) }}" class="dropdown-item">Edit</a>
+                                    @if(! $agent->user?->is_active)
+                                        <form method="POST" action="{{ route('admin.agents.approve', $agent) }}">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item text-success">Aktifkan</button>
+                                        </form>
+                                    @else
+                                        <form method="POST" action="{{ route('admin.agents.suspend', $agent) }}" onsubmit="return confirm('Yakin ingin mensuspend agen ini?')">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item text-warning">Suspend</button>
+                                        </form>
+                                    @endif
+                                    <div class="dropdown-divider"></div>
+                                    <form method="POST" action="{{ route('admin.agents.destroy', $agent) }}" onsubmit="return confirm('Hapus agen ini?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="dropdown-item text-danger">Hapus</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="d-none d-md-flex gap-1 justify-content-end">
                                 <a href="{{ route('admin.agents.show', $agent) }}"
                                     class="btn btn-sm btn-ghost-primary" title="Detail">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7"/></svg>
@@ -255,7 +271,7 @@
                                 @endif
                                 <form method="POST" action="{{ route('admin.agents.destroy', $agent) }}"
                                     id="delete-form-{{ $agent->id }}"
-                                    onsubmit="return confirm('Hapus agen ini secara permanen? Tindakan tidak dapat dibatalkan.')">
+                                    onsubmit="return confirm('Hapus agen ini secara permanen?')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-ghost-danger" title="Hapus">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></svg>
@@ -285,74 +301,5 @@
 
 </div>{{-- /tab-list --}}
 
-{{-- ═══════════════════════════════════════════════════════════════════════ --}}
-{{-- TAB 2: HIERARKI AGEN (collapsible tree)                                --}}
-{{-- ═══════════════════════════════════════════════════════════════════════ --}}
-<div class="tab-pane fade" id="tab-tree" role="tabpanel">
-
-    {{-- Legend --}}
-    <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
-        <span class="text-muted small me-1">Generasi:</span>
-        <span class="gen-pill gen-0">● Agen Utama</span>
-        <span class="gen-pill gen-1">● Gen-1</span>
-        <span class="gen-pill gen-2">● Gen-2</span>
-        <span class="gen-pill gen-3">● Gen-3</span>
-        <div class="ms-auto d-flex gap-2">
-            <button class="btn btn-sm btn-outline-secondary" id="btn-expand-all">Buka Semua</button>
-            <button class="btn btn-sm btn-outline-secondary" id="btn-collapse-all">Tutup Semua</button>
-        </div>
-    </div>
-
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-3">
-
-            @if($rootAgents->isEmpty())
-                <div class="text-center text-muted py-5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg mb-2" width="48" height="48" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></svg>
-                    <p class="mb-0">Belum ada agen terdaftar.</p>
-                </div>
-            @else
-                <ul class="agent-tree" id="hierarchy-root">
-                    @foreach($rootAgents as $root)
-                        @include('admin.agents._tree_node', ['agent' => $root, 'depth' => 0])
-                    @endforeach
-                </ul>
-            @endif
-
-        </div>
-    </div>
-</div>{{-- /tab-tree --}}
-
 </div>{{-- /tab-content --}}
 @endsection
-
-@push('scripts')
-<script>
-(function () {
-    // ── Toggle a single node ──────────────────────────────────────────────
-    function toggle(item) {
-        const node    = item.closest('.tree-node');
-        const chevron = item.querySelector('.tree-toggle');
-        const kids    = node.querySelector(':scope > .tree-children');
-        if (!kids) return;
-        const open = kids.classList.toggle('open');
-        chevron.classList.toggle('open', open);
-    }
-
-    document.getElementById('hierarchy-root')?.addEventListener('click', function (e) {
-        const item = e.target.closest('.tree-item');
-        if (item) toggle(item);
-    });
-
-    // ── Expand / Collapse all ─────────────────────────────────────────────
-    document.getElementById('btn-expand-all')?.addEventListener('click', function () {
-        document.querySelectorAll('.tree-children').forEach(el => el.classList.add('open'));
-        document.querySelectorAll('.tree-toggle:not(.leaf)').forEach(el => el.classList.add('open'));
-    });
-    document.getElementById('btn-collapse-all')?.addEventListener('click', function () {
-        document.querySelectorAll('.tree-children').forEach(el => el.classList.remove('open'));
-        document.querySelectorAll('.tree-toggle:not(.leaf)').forEach(el => el.classList.remove('open'));
-    });
-})();
-</script>
-@endpush
