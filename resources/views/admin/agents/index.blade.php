@@ -83,7 +83,7 @@
         <div class="row g-2 align-items-center">
             <div class="col">
                 <h2 class="page-title">Manajemen Agen</h2>
-                <div class="text-muted small mt-1">Kelola seluruh data agen, status, dan jaringan referral.</div>
+                <div class="text-muted small mt-1 mb-4">Kelola seluruh data agen, status, dan jaringan referral.</div>
             </div>
             <div class="col-auto ms-auto">
                 <a href="{{ route('admin.agents.create') }}" class="btn btn-primary" id="btn-create-agent">

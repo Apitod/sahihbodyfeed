@@ -120,7 +120,7 @@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <h1 class="navbar-brand px-2 py-4">
+                <h1 class="navbar-brand px-2">
                     <a href="/" class="text-white text-decoration-none fw-bold" style="letter-spacing: 0.05em; font-size: 1.25rem;">
                         <i class="ti ti-leaf me-1"></i> SAHIHBODYFEED
                     </a>
@@ -159,16 +159,7 @@
             <header class="navbar navbar-expand-md d-none d-lg-flex d-print-none border-bottom py-2" style="background-color: var(--brand-1); border-color: rgba(0,0,0,0.05) !important;">
                 <div class="container-fluid">
                     <div class="ms-auto d-flex align-items-center gap-3">
-                        <div class="d-none d-md-flex">
-                            <a href="?theme=dark" class="nav-link px-0 hide-theme-dark" title="Enable dark mode" data-bs-toggle="tooltip"
-                               data-bs-placement="bottom">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" /></svg>
-                            </a>
-                            <a href="?theme=light" class="nav-link px-0 hide-theme-light" title="Enable light mode" data-bs-toggle="tooltip"
-                               data-bs-placement="bottom">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" /></svg>
-                            </a>
-                        </div>
+
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown">
                                 <span class="avatar avatar-sm rounded-pill shadow-sm" style="background: var(--brand-4); color: white;">{{ substr(auth()->user()->username, 0, 2) }}</span>

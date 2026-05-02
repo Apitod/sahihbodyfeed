@@ -19,8 +19,8 @@ class Agent extends Model
         'no_telp',
         'alamat',
 
-        // ── KTP document ──────────────────────────────────────────────────
-        'foto_ktp',
+        // ── KTP identity number ───────────────────────────────────────────
+        'nik',
 
         // ── Bank payout data ──────────────────────────────────────────────
         'bank_name',

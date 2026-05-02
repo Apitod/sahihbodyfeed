@@ -170,15 +170,10 @@
         <a href="#home" @click="mobileMenu = false" class="text-2xl font-serif">Home</a>
         <a href="#product" @click="mobileMenu = false" class="text-2xl font-serif">Product</a>
         <a href="#testimonials" @click="mobileMenu = false" class="text-2xl font-serif">Testimonials</a>
-        @auth
-            <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('agent.dashboard') }}" class="bg-brand-4 text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest">Dashboard</a>
-        @else
-            <a href="{{ route('login') }}" class="text-xl">Login</a>
-        @endauth
     </div>
 
     <!-- Hero Section -->
-    <section id="home" class="hero-gradient min-h-screen relative overflow-hidden flex items-center pt-20">
+    <section id="home" class="hero-gradient min-h-screen relative overflow-hidden flex items-center pt-32 lg:pt-20 pb-16 lg:pb-0">
         <!-- Left Vertical Indicator (Desktop) -->
         <div class="hidden lg:flex absolute left-12 top-1/2 -translate-y-1/2 flex-col items-center space-y-4">
             <span class="text-[10px] font-bold tracking-widest uppercase rotate-90 origin-left mb-8">01</span>
@@ -187,9 +182,17 @@
         </div>
 
         <div class="container mx-auto px-6 lg:px-24">
-            <div class="grid lg:grid-cols-12 gap-12 items-center">
+            <!-- Mobile Headline -->
+            <div class="lg:hidden text-center mb-8">
+                <h2 class="text-brand-2 font-serif italic text-lg mb-2">Murninya Bijian Pilihan</h2>
+                <h1 class="text-4xl font-serif font-black leading-tight">
+                    Sahih <span class="text-brand-4">&</span> Bodyfeed
+                </h1>
+            </div>
+
+            <div class="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                 <!-- Product Image -->
-                <div class="lg:col-span-5 relative">
+                <div class="w-3/4 lg:w-full lg:col-span-5 relative mx-auto lg:mx-0">
                     <div class="absolute inset-0 bg-brand-2/20 rounded-full blur-3xl -z-10 scale-150"></div>
                     <img src="{{ asset('images/sahih.png') }}" alt="Sahih Bodyfeed" class="w-full max-w-lg mx-auto drop-shadow-[0_35px_35px_rgba(0,0,0,0.25)]">
                     
@@ -197,16 +200,18 @@
                 </div>
 
                 <!-- Text Content -->
-                <div class="lg:col-span-7 lg:pl-12">
-                    <h2 class="text-brand-2 font-serif italic text-xl lg:text-3xl mb-4">Murninya Bijian Pilihan</h2>
-                    <h1 class="text-4xl sm:text-5xl lg:text-8xl font-serif font-black leading-tight mb-8">
-                        Sahih <span class="text-brand-4">&</span> <br>Bodyfeed
-                    </h1>
-                    <p class="text-lg lg:text-xl text-gray-600 max-w-xl leading-relaxed mb-10">
+                <div class="lg:col-span-7 lg:pl-12 text-center lg:text-left">
+                    <div class="hidden lg:block">
+                        <h2 class="text-brand-2 font-serif italic text-xl lg:text-3xl mb-4">Murninya Bijian Pilihan</h2>
+                        <h1 class="text-4xl sm:text-5xl lg:text-8xl font-serif font-black leading-tight mb-8">
+                            Sahih <span class="text-brand-4">&</span> <br>Bodyfeed
+                        </h1>
+                    </div>
+                    <p class="text-lg lg:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed mb-10">
                         Tubuh butuh asupan yang benar, bukan sekadar kenyang. Sahih Bodyfeed hadir sebagai minuman multigrain premium yang menggabungkan kacang-kacangan, biji-bijian, dan labu kuning.
                     </p>
 
-                    <div class="flex flex-wrap items-center gap-8 mb-16">
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-8 mb-16">
                         <div class="flex items-center space-x-4">
                             <span class="text-3xl lg:text-4xl font-serif font-bold text-brand-4">Rp 295.000</span>
                             <span class="text-xs lg:text-sm font-bold text-gray-400 uppercase tracking-widest">/ Kaleng</span>
@@ -214,18 +219,18 @@
                     </div>
 
                     <!-- Hero Stats -->
-                    <div class="grid grid-cols-3 gap-8 pt-12 border-t border-black/5">
+                    <div class="grid grid-cols-3 gap-4 lg:gap-8 pt-12 border-t border-black/5">
                         <div>
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Ingredients</p>
-                            <p class="text-lg font-serif font-bold">100% Organik</p>
+                            <p class="text-base lg:text-lg font-serif font-bold">100% Organik</p>
                         </div>
                         <div>
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Benefit</p>
-                            <p class="text-lg font-serif font-bold">Pencernaan</p>
+                            <p class="text-base lg:text-lg font-serif font-bold">Pencernaan</p>
                         </div>
                         <div>
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Volume</p>
-                            <p class="text-lg font-serif font-bold">25ml / Saji</p>
+                            <p class="text-base lg:text-lg font-serif font-bold">25ml / Saji</p>
                         </div>
                     </div>
                 </div>

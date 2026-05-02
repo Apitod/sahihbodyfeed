@@ -15,7 +15,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 /**
@@ -123,7 +122,7 @@ class AgentController extends Controller
      * Admin-created agents are immediately activated — no payment proof or
      * transaction verification step is required.
      *
-     * KTP photo is stored at storage/app/public/ktp/{timestamp}_{filename}.
+     * NIK is stored as a plain string (max 16 digits) to avoid file storage overhead.
      */
     public function store(Request $request): RedirectResponse
     {
@@ -135,8 +134,8 @@ class AgentController extends Controller
             'nama'              => 'required|string|max:120',
             'no_telp'           => 'nullable|string|max:20|unique:agents,no_telp',
             'alamat'            => 'nullable|string|max:500',
-            // ── KTP photo (image file, max 2 MB) ───────────────────────────────────
-            'foto_ktp'          => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            // ── NIK (16 digit max, numeric string) ─────────────────────────────────
+            'nik'               => 'nullable|string|digits_between:1,16|unique:agents,nik',
             // ── Bank data ───────────────────────────────────────────────────────────
             'bank_name'         => 'nullable|string|max:100',
             'bank_account'      => 'nullable|string|max:30',
@@ -145,14 +144,7 @@ class AgentController extends Controller
             'upline_id'         => 'nullable|exists:agents,id',
         ]);
 
-        // Handle KTP file upload.
-        $ktpPath = null;
-        if ($request->hasFile('foto_ktp')) {
-            $ktpPath = $request->file('foto_ktp')
-                ->storeAs('ktp', time() . '_' . $request->file('foto_ktp')->getClientOriginalName(), 'public');
-        }
-
-        DB::transaction(function () use ($validated, $ktpPath) {
+        DB::transaction(function () use ($validated) {
             $user = User::create([
                 'username'  => $validated['username'],
                 'password'  => Hash::make($validated['password']),
@@ -167,7 +159,7 @@ class AgentController extends Controller
                 'nama'              => $validated['nama'],
                 'no_telp'           => $validated['no_telp']           ?? null,
                 'alamat'            => $validated['alamat']            ?? null,
-                'foto_ktp'          => $ktpPath,
+                'nik'               => $validated['nik']               ?? null,
                 'bank_name'         => $validated['bank_name']         ?? null,
                 'bank_account'      => $validated['bank_account']      ?? null,
                 'bank_account_name' => $validated['bank_account_name'] ?? null,
@@ -203,8 +195,8 @@ class AgentController extends Controller
     /**
      * Update an agent's profile data.
      *
-     * If a new KTP photo is uploaded, the old file is deleted from disk first.
      * Username and password changes go through the User model directly.
+     * NIK is stored as a plain 16-digit string — no file I/O required.
      */
     public function update(Request $request, Agent $agent): RedirectResponse
     {
@@ -213,8 +205,8 @@ class AgentController extends Controller
             'nama'              => 'required|string|max:120',
             'no_telp'           => 'nullable|string|max:20|unique:agents,no_telp,' . $agent->id,
             'alamat'            => 'nullable|string|max:500',
-            // ── KTP photo (optional on update) ───────────────────────────────────
-            'foto_ktp'          => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            // ── NIK (optional on update, must still be unique) ───────────────────
+            'nik'               => 'nullable|string|digits_between:1,16|unique:agents,nik,' . $agent->id,
             // ── Bank data ───────────────────────────────────────────────────────────
             'bank_name'         => 'nullable|string|max:100',
             'bank_account'      => 'nullable|string|max:30',
@@ -231,19 +223,6 @@ class AgentController extends Controller
                 },
             ],
         ]);
-
-        // Handle KTP file replacement.
-        if ($request->hasFile('foto_ktp')) {
-            // Delete the old file from storage if it exists.
-            if ($agent->foto_ktp) {
-                Storage::disk('public')->delete($agent->foto_ktp);
-            }
-            $validated['foto_ktp'] = $request->file('foto_ktp')
-                ->storeAs('ktp', time() . '_' . $request->file('foto_ktp')->getClientOriginalName(), 'public');
-        } else {
-            // Do not overwrite existing path if no new file was uploaded.
-            unset($validated['foto_ktp']);
-        }
 
         $agent->update($validated);
 

@@ -135,14 +135,12 @@
                         <dd class="col-6">{{ $agent->bank_account_name ?? '—' }}</dd>
                     </dl>
 
-                    @if($agent->foto_ktp)
-                        <div class="hr-text mt-3 mb-2">Dokumen</div>
-                        <div class="text-start">
-                            <div class="text-muted small mb-1">Foto KTP</div>
-                            <a href="{{ asset('storage/' . $agent->foto_ktp) }}" target="_blank">
-                                <img src="{{ asset('storage/' . $agent->foto_ktp) }}" alt="KTP {{ $agent->nama }}" class="img-fluid rounded border" style="max-height: 120px; object-fit: cover;">
-                            </a>
-                        </div>
+                    @if($agent->nik)
+                        <div class="hr-text mt-3 mb-2">Identitas</div>
+                        <dl class="row text-start g-1 small">
+                            <dt class="col-6 text-muted">NIK</dt>
+                            <dd class="col-6 fw-semibold font-monospace">{{ $agent->nik }}</dd>
+                        </dl>
                     @endif
                 </div>
             </div>

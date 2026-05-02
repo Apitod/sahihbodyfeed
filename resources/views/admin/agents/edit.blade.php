@@ -22,7 +22,7 @@
 </div>
 
 <form method="POST" action="{{ route('admin.agents.update', $agent) }}"
-      enctype="multipart/form-data" id="edit-agent-form">
+      id="edit-agent-form">
 @csrf
 @method('PUT')
 
@@ -165,7 +165,7 @@
 
     </div>{{-- /left --}}
 
-    {{-- ── RIGHT COLUMN: KTP + Submit ── --}}
+    {{-- ── RIGHT COLUMN: NIK + Submit ── --}}
     <div class="col-12 col-lg-5">
 
         <div class="card border-0 shadow-sm mb-4">
@@ -174,45 +174,28 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-purple" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h2"/><path d="M15 12h2"/><path d="M7 16h10"/>
                     </svg>
-                    Foto KTP
+                    Identitas (NIK)
                 </h3>
             </div>
-            <div class="card-body d-flex flex-column align-items-center">
-
-                {{-- Show existing KTP or placeholder --}}
-                <div id="ktp-preview-container" class="w-100 mb-3 rounded border border-2 border-dashed d-flex align-items-center justify-content-center"
-                    style="min-height: 200px; background: var(--tblr-gray-100); overflow: hidden; cursor: pointer;"
-                    onclick="document.getElementById('input-foto-ktp').click()">
-
-                    @if($agent->foto_ktp)
-                        <img id="ktp-preview-img"
-                            src="{{ asset('storage/' . $agent->foto_ktp) }}"
-                            alt="Foto KTP {{ $agent->nama }}"
-                            class="img-fluid rounded"
-                            style="max-height: 220px; object-fit: contain;">
-                    @else
-                        <img id="ktp-preview-img" src="" alt="Preview KTP" class="img-fluid rounded d-none" style="max-height: 220px; object-fit: contain;">
-                        <div id="ktp-placeholder" class="text-center text-muted py-4 px-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg mb-2 text-muted" width="48" height="48" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 8h.01"/><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M3 13l4 -4a3 5 0 0 1 3 0l4 4"/><path d="M13 12l2 -2a3 5 0 0 1 3 0l2 2"/>
-                            </svg>
-                            <p class="mb-1 fw-medium">Belum ada foto KTP</p>
-                            <p class="small mb-0">Klik untuk upload</p>
-                        </div>
-                    @endif
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label" for="edit-nik">Nomor NIK (KTP)</label>
+                    <input type="text" class="form-control @error('nik') is-invalid @enderror"
+                        id="edit-nik" name="nik"
+                        value="{{ old('nik', $agent->nik) }}"
+                        maxlength="16"
+                        inputmode="numeric"
+                        pattern="[0-9]{0,16}"
+                        placeholder="16 digit nomor NIK"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,16)">
+                    @error('nik')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <div class="form-hint">Nomor Induk Kependudukan, maksimal 16 angka.</div>
                 </div>
-
-                <input type="file" class="d-none @error('foto_ktp') is-invalid @enderror"
-                    id="input-foto-ktp" name="foto_ktp" accept="image/jpeg,image/png">
-                @error('foto_ktp')
-                    <div class="text-danger small mb-2">{{ $message }}</div>
-                @enderror
-
-                <button type="button" class="btn btn-outline-secondary btn-sm w-100"
-                    onclick="document.getElementById('input-foto-ktp').click()">
-                    {{ $agent->foto_ktp ? 'Ganti Foto KTP' : 'Upload Foto KTP' }}
-                </button>
-                <p class="text-muted small mt-2 mb-0 text-center">JPG, PNG — Maks. 2 MB. Biarkan kosong untuk tidak mengubah foto.</p>
+                <div id="nik-counter" class="text-end small text-muted mb-0">
+                    <span id="nik-char-count">0</span>/16 digit
+                </div>
             </div>
         </div>
 
@@ -238,19 +221,15 @@
 
 @push('scripts')
 <script>
-    document.getElementById('input-foto-ktp').addEventListener('change', function (e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function (ev) {
-            const img = document.getElementById('ktp-preview-img');
-            const placeholder = document.getElementById('ktp-placeholder');
-            img.src = ev.target.result;
-            img.classList.remove('d-none');
-            if (placeholder) placeholder.classList.add('d-none');
-        };
-        reader.readAsDataURL(file);
-    });
+    // NIK digit counter
+    const nikInput = document.getElementById('edit-nik');
+    const nikCount = document.getElementById('nik-char-count');
+    if (nikInput && nikCount) {
+        nikInput.addEventListener('input', function () {
+            nikCount.textContent = this.value.length;
+        });
+        nikCount.textContent = nikInput.value.length;
+    }
 </script>
 @endpush
 @endsection
