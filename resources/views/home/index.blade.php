@@ -150,7 +150,7 @@
             <!-- Right Icons -->
             <div class="flex items-center space-x-6">
                 @auth
-                    <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('agent.dashboard') }}" class="bg-brand-4 text-white px-6 py-2.5 rounded-full text-xs font-bold tracking-widest uppercase hover:bg-brand-4/90 transition shadow-lg shadow-brand-4/20">Dashboard</a>
+                    <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('agent.dashboard') }}" class="bg-brand-4 text-white px-6 py-2.5 rounded-full text-xs font-bold tracking-widest uppercase hover:bg-brand-4/90 transition shadow-lg shadow-brand-4/20">Dashboard</a>
                 @else
                     <a href="{{ route('login') }}" class="bg-brand-4 text-white px-8 py-3 rounded-full text-xs font-bold tracking-widest uppercase hover:bg-brand-4/90 transition shadow-lg shadow-brand-4/20">Login</a>
                 @endauth
@@ -171,7 +171,7 @@
         <a href="#product" @click="mobileMenu = false" class="text-2xl font-serif">Product</a>
         <a href="#testimonials" @click="mobileMenu = false" class="text-2xl font-serif">Testimonials</a>
         @auth
-            <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('agent.dashboard') }}" class="bg-brand-4 text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest">Dashboard</a>
+            <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('agent.dashboard') }}" class="bg-brand-4 text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest">Dashboard</a>
         @else
             <a href="{{ route('login') }}" class="text-xl">Login</a>
         @endauth
@@ -277,28 +277,52 @@
         </div>
     </section>
 
-    <!-- Numbers Section -->
-    <section class="py-32 bg-white">
-        <div class="container mx-auto px-6">
-            <div class="text-center mb-24">
-                <p class="text-[10px] font-bold text-brand-2 uppercase tracking-[0.4em] mb-4">Our Achievement</p>
+    <!-- Product Spotlight Section (Focus on Quality) -->
+    <section class="py-24 lg:py-32 bg-white relative overflow-hidden">
+        <div class="container mx-auto px-6 lg:px-24">
+            <div class="text-center mb-16 lg:mb-24">
+                <p class="text-[10px] font-bold text-brand-4 uppercase tracking-[0.4em] mb-4">Premium Quality</p>
                 <h2 class="text-4xl lg:text-6xl font-serif font-bold max-w-3xl mx-auto leading-tight">
-                    Dipercaya Oleh Ribuan Keluarga di Indonesia
+                    Kebaikan Alam dalam <br>Setiap Takaran
                 </h2>
+                <p class="text-gray-500 mt-6 max-w-2xl mx-auto text-lg">Kami percaya bahwa kesehatan dimulai dari apa yang Anda konsumsi. Sahihbodyfeed diformulasikan dengan bahan-bahan murni pilihan tanpa kompromi.</p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-12 text-center max-w-5xl mx-auto">
-                <div class="space-y-4">
-                    <h3 class="text-5xl lg:text-8xl font-serif font-bold text-brand-dark">2,500<span class="text-brand-4">+</span></h3>
-                    <p class="text-[10px] lg:text-sm font-bold text-gray-400 uppercase tracking-widest">Testimoni</p>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                <!-- Ingredient 1 -->
+                <div class="bg-brand-1/30 p-8 rounded-[40px] border border-brand-1 hover:border-brand-4 transition-all duration-500 group">
+                    <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform">
+                        <i class="las la-seedling text-3xl text-brand-4"></i>
+                    </div>
+                    <h3 class="text-xl font-serif font-bold mb-4">Multigrain Pilihan</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Campuran biji-bijian utuh yang kaya akan mikronutrisi untuk memenuhi kebutuhan energi harian Anda.</p>
                 </div>
-                <div class="space-y-4">
-                    <h3 class="text-5xl lg:text-8xl font-serif font-bold text-brand-dark">500<span class="text-brand-2">+</span></h3>
-                    <p class="text-[10px] lg:text-sm font-bold text-gray-400 uppercase tracking-widest">Agen</p>
+
+                <!-- Ingredient 2 -->
+                <div class="bg-brand-1/30 p-8 rounded-[40px] border border-brand-1 hover:border-brand-2 transition-all duration-500 group">
+                    <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform">
+                        <i class="las la-sun text-3xl text-brand-2"></i>
+                    </div>
+                    <h3 class="text-xl font-serif font-bold mb-4">Labu Kuning</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Sumber Betakaroten alami yang sangat baik untuk kesehatan mata dan memperkuat sistem imun tubuh.</p>
                 </div>
-                <div class="space-y-4">
-                    <h3 class="text-5xl lg:text-8xl font-serif font-bold text-brand-dark">17<span class="text-brand-3">M+</span></h3>
-                    <p class="text-[10px] lg:text-sm font-bold text-gray-400 uppercase tracking-widest">Produk Terjual</p>
+
+                <!-- Ingredient 3 -->
+                <div class="bg-brand-1/30 p-8 rounded-[40px] border border-brand-1 hover:border-brand-3 transition-all duration-500 group">
+                    <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform">
+                        <i class="las la-apple-alt text-3xl text-brand-3"></i>
+                    </div>
+                    <h3 class="text-xl font-serif font-bold mb-4">Tinggi Serat</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Membantu sistem pencernaan bekerja lebih optimal dan memberikan efek kenyang lebih lama (diet-friendly).</p>
+                </div>
+
+                <!-- Ingredient 4 -->
+                <div class="bg-brand-1/30 p-8 rounded-[40px] border border-brand-1 hover:border-brand-dark transition-all duration-500 group">
+                    <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform">
+                        <i class="las la-leaf text-3xl text-brand-dark"></i>
+                    </div>
+                    <h3 class="text-xl font-serif font-bold mb-4">100% Alami</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Tanpa bahan pengawet, pemanis buatan, atau pewarna kimia. Aman dikonsumsi rutin setiap hari.</p>
                 </div>
             </div>
         </div>
@@ -433,7 +457,7 @@
         <div class="container mx-auto px-6 lg:px-24">
             <div class="grid lg:grid-cols-12 gap-16 mb-24">
                 <div class="lg:col-span-5">
-                    <img src="{{ asset('sahihbodyfeed.png') }}" class="h-12 mb-8 invert">
+                    <img src="{{ asset('sahihbodyfeed.png') }}" class="h-16 mb-8 object-contain">
                     <p class="text-gray-400 text-lg leading-relaxed max-w-sm mb-12">
                         Memberikan yang terbaik dari alam untuk kesehatan keluarga Anda. Minuman multigrain premium untuk hidup yang lebih berkualitas.
                     </p>
@@ -442,7 +466,9 @@
                             <i class="lab la-instagram text-2xl"></i>
                         </a>
                         <a href="https://www.tiktok.com/@sahih.bodyfeed?_r=1&_t=ZS-95zsUpRRjcq" target="_blank" class="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-4 hover:border-brand-4 transition">
-                            <i class="lab la-tiktok text-2xl"></i>
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M448 209.91a210.06 210.06 0 0 1 -122.77-39.25V349.38a162.55 162.55 0 1 1 -162.55-162.54 161.63 161.63 0 0 1 71.89 16.54v92.59a70.07 70.07 0 1 0 -70.07 70.07 70.07 70.07 0 0 0 70.07-70.07V0h93.54a107.41 107.41 0 0 0 107.42 107.41v102.5z"/>
+                            </svg>
                         </a>
                         <a href="https://wa.me/082123373732" target="_blank" class="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-4 hover:border-brand-4 transition">
                             <i class="lab la-whatsapp text-2xl"></i>
@@ -472,7 +498,7 @@
                         </li>
                         <li class="flex items-start gap-4">
                             <i class="las la-map-marker text-brand-4 text-xl"></i>
-                            <span class="leading-relaxed">Jl. Pengayoman, Kompleks Pasar Segar Lantai 1 Blok KBD 11, Kota Makassar, Sulawesi Selatan 90231</span>
+                            <span class="leading-relaxed">Jl. Pengayoman, Kompleks Pasar Segar Lantai 1 Blok KBD 29, Kota Makassar, Sulawesi Selatan 90231</span>
                         </li>
                     </ul>
                 </div>
