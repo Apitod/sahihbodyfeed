@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sahih Bodyfeed - Premium Multigrain Cereal</title>
+    <link rel="icon" type="image/png" href="{{ asset('sahihbodyfeed.png') }}">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -186,7 +187,7 @@
             <div class="lg:hidden text-center mb-8">
                 <h2 class="text-brand-2 font-serif italic text-lg mb-2">Murninya Bijian Pilihan</h2>
                 <h1 class="text-4xl font-serif font-black leading-tight">
-                    Sahih <span class="text-brand-4">&</span> Bodyfeed
+                    Sahih Bodyfeed
                 </h1>
             </div>
 
@@ -204,7 +205,7 @@
                     <div class="hidden lg:block">
                         <h2 class="text-brand-2 font-serif italic text-xl lg:text-3xl mb-4">Murninya Bijian Pilihan</h2>
                         <h1 class="text-4xl sm:text-5xl lg:text-8xl font-serif font-black leading-tight mb-8">
-                            Sahih <span class="text-brand-4">&</span> <br>Bodyfeed
+                            Sahih Bodyfeed
                         </h1>
                     </div>
                     <p class="text-lg lg:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed mb-10">

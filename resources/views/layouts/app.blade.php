@@ -4,6 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <title>Sahihbodyfeed - @yield('title', 'Sistem Multi-Level')</title>
+    <link rel="icon" type="image/png" href="{{ asset('sahihbodyfeed.png') }}">
     <!-- CSS files from Tabler.io -->
     <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css" rel="stylesheet"/>
     <style>
