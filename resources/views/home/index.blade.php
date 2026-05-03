@@ -175,12 +175,6 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero-gradient min-h-screen relative overflow-hidden flex items-center pt-32 lg:pt-20 pb-16 lg:pb-0">
-        <!-- Left Vertical Indicator (Desktop) -->
-        <div class="hidden lg:flex absolute left-12 top-1/2 -translate-y-1/2 flex-col items-center space-y-4">
-            <span class="text-[10px] font-bold tracking-widest uppercase rotate-90 origin-left mb-8">01</span>
-            <div class="indicator-line"></div>
-            <span class="text-[10px] font-bold tracking-widest uppercase rotate-90 origin-left mt-8 opacity-30">05</span>
-        </div>
 
         <div class="container mx-auto px-6 lg:px-24">
             <!-- Mobile Headline -->
