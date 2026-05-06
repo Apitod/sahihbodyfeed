@@ -85,16 +85,19 @@
                 <h2 class="page-title">Manajemen Agen</h2>
                 <div class="text-muted small mt-1 mb-4">Kelola seluruh data agen, status, dan jaringan referral.</div>
             </div>
-            <div class="col-auto ms-auto">
-                <a href="{{ route('admin.agents.create') }}" class="btn btn-primary" id="btn-create-agent">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24"
-                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                        <path d="M12 5l0 14"/><path d="M5 12l14 0"/>
-                    </svg>
-                    Tambah Agen
-                </a>
-            </div>
+        <div class="col-auto ms-auto">
+            @can('create-agent')
+            <a href="{{ auth()->user()->isSuperAdmin() ? route('superadmin.agents.create') : route('admin.agents.create') }}" 
+               class="btn btn-primary" id="btn-create-agent">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24"
+                    stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M12 5l0 14"/><path d="M5 12l14 0"/>
+                </svg>
+                Tambah Agen
+            </a>
+            @endcan
+        </div>
         </div>
     </div>
 </div>
@@ -134,10 +137,16 @@
 {{-- ═══════════════════════════════════════════════════════════════════════ --}}
 <div class="tab-pane fade show active" id="tab-list" role="tabpanel">
 
+@php
+    $baseRoute = auth()->user()->isSuperAdmin() ? 'superadmin.agents' : 'admin.agents';
+    $approveRoute = $baseRoute . '.approve';
+    $suspendRoute = $baseRoute . '.suspend';
+@endphp
+
     {{-- Filters --}}
     <div class="card border-0 shadow-sm mb-3">
         <div class="card-body">
-            <form method="GET" action="{{ route('admin.agents.index') }}" class="row g-2 align-items-end" id="filter-form">
+            <form method="GET" action="{{ route($baseRoute . '.index') }}" class="row g-2 align-items-end" id="filter-form">
                 <div class="col-12 col-md-5">
                     <label class="form-label text-muted small mb-1">Cari Agen</label>
                     <input type="text" name="search" id="search-input" class="form-control"
@@ -154,7 +163,7 @@
                 </div>
                 <div class="col-auto">
                     <button type="submit" class="btn btn-primary" id="btn-filter">Filter</button>
-                    <a href="{{ route('admin.agents.index') }}" class="btn btn-outline-secondary ms-1">Reset</a>
+                <a href="{{ route('admin.agents.index') }}" class="btn btn-outline-secondary ms-1">Reset</a>
                 </div>
             </form>
         </div>
@@ -222,37 +231,43 @@
                             <div class="dropdown d-md-none">
                                 <button class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown">Aksi</button>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="{{ route('admin.agents.show', $agent) }}" class="dropdown-item">Detail</a>
-                                    <a href="{{ route('admin.agents.edit', $agent) }}" class="dropdown-item">Edit</a>
+                                    <a href="{{ route($baseRoute . '.show', $agent) }}" class="dropdown-item">Detail</a>
+                                    @can('edit-agent')
+                                    <a href="{{ route($baseRoute . '.edit', $agent) }}" class="dropdown-item">Edit</a>
+                                    @endcan
                                     @if(! $agent->user?->is_active)
-                                        <form method="POST" action="{{ route('admin.agents.approve', $agent) }}">
+                                        <form method="POST" action="{{ route($approveRoute, $agent) }}">
                                             @csrf
                                             <button type="submit" class="dropdown-item text-success">Aktifkan</button>
                                         </form>
                                     @else
-                                        <form method="POST" action="{{ route('admin.agents.suspend', $agent) }}" onsubmit="return confirm('Yakin ingin mensuspend agen ini?')">
+                                        <form method="POST" action="{{ route($suspendRoute, $agent) }}" onsubmit="return confirm('Yakin ingin mensuspend agen ini?')">
                                             @csrf
                                             <button type="submit" class="dropdown-item text-warning">Suspend</button>
                                         </form>
                                     @endif
+                                    @can('delete-agent')
                                     <div class="dropdown-divider"></div>
-                                    <form method="POST" action="{{ route('admin.agents.destroy', $agent) }}" onsubmit="return confirm('Hapus agen ini?')">
+                                    <form method="POST" action="{{ route($baseRoute . '.destroy', $agent) }}" onsubmit="return confirm('Hapus agen ini?')">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="dropdown-item text-danger">Hapus</button>
                                     </form>
+                                    @endcan
                                 </div>
                             </div>
                             <div class="d-none d-md-flex gap-1 justify-content-end">
-                                <a href="{{ route('admin.agents.show', $agent) }}"
+                                <a href="{{ route($baseRoute . '.show', $agent) }}"
                                     class="btn btn-sm btn-ghost-primary" title="Detail">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7"/></svg>
                                 </a>
-                                <a href="{{ route('admin.agents.edit', $agent) }}"
+                                @can('edit-agent')
+                                <a href="{{ route($baseRoute . '.edit', $agent) }}"
                                     class="btn btn-sm btn-ghost-secondary" title="Edit">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/></svg>
                                 </a>
+                                @endcan
                                 @if(! $agent->user?->is_active)
-                                    <form method="POST" action="{{ route('admin.agents.approve', $agent) }}"
+                                    <form method="POST" action="{{ route($approveRoute, $agent) }}"
                                         id="approve-form-{{ $agent->id }}">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-ghost-success" title="Aktifkan">
@@ -260,7 +275,7 @@
                                         </button>
                                     </form>
                                 @else
-                                    <form method="POST" action="{{ route('admin.agents.suspend', $agent) }}"
+                                    <form method="POST" action="{{ route($suspendRoute, $agent) }}"
                                         id="suspend-form-{{ $agent->id }}"
                                         onsubmit="return confirm('Yakin ingin mensuspend agen ini?')">
                                         @csrf
@@ -269,7 +284,8 @@
                                         </button>
                                     </form>
                                 @endif
-                                <form method="POST" action="{{ route('admin.agents.destroy', $agent) }}"
+                                @can('delete-agent')
+                                <form method="POST" action="{{ route($baseRoute . '.destroy', $agent) }}"
                                     id="delete-form-{{ $agent->id }}"
                                     onsubmit="return confirm('Hapus agen ini secara permanen?')">
                                     @csrf @method('DELETE')
@@ -277,6 +293,7 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></svg>
                                     </button>
                                 </form>
+                                @endcan
                             </div>
                         </td>
                     </tr>

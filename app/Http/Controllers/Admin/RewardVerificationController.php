@@ -25,9 +25,16 @@ class RewardVerificationController extends Controller
 
     public function approve(RewardClaim $claim, Request $request)
     {
+        if ($claim->status !== \App\Enums\ClaimStatus::Pending) {
+            return back()->with('error', 'Hanya klaim berstatus Pending yang dapat direview.');
+        }
+
         try {
-            $this->rewardClaimService->approveClaim($claim, $request->user());
-            return back()->with('success', "Klaim reward {$claim->reward->name} untuk agen {$claim->agent->nama} berhasil disetujui. Matching reward rules telah diproses.");
+            $claim->update([
+                'status'               => \App\Enums\ClaimStatus::PendingSuperadmin,
+                'verified_by_admin_id' => $request->user()->id,
+            ]);
+            return back()->with('success', "Klaim reward {$claim->reward->name} telah diverifikasi admin. Menunggu persetujuan Superadmin.");
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }

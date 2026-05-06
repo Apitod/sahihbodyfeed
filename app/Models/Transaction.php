@@ -18,7 +18,8 @@ class Transaction extends Model
         'amount',
         'status',
         'proof_of_payment',
-        'verified_by',
+        'verified_by_admin_id',
+        'verified_by_superadmin_id',
         'verified_at',
     ];
 
@@ -43,12 +44,28 @@ class Transaction extends Model
     }
 
     /**
-     * The admin user who verified this transaction.
-     * Returns null if the transaction is still pending verification.
+     * The admin (Tier 2) who did the initial review of this transaction.
+     */
+    public function adminVerifier(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by_admin_id');
+    }
+
+    /**
+     * The superadmin (Tier 1) who gave final approval for this transaction.
+     * Returns null if the transaction is still pending final verification.
+     */
+    public function superadminVerifier(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by_superadmin_id');
+    }
+
+    /**
+     * @deprecated Use superadminVerifier() for clarity with the new 3-tier system.
      */
     public function verifier(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'verified_by');
+        return $this->superadminVerifier();
     }
 
     /**

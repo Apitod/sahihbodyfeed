@@ -123,16 +123,16 @@ class AgentRegistrationService
             );
         }
 
-        if ($transaction->status !== TransactionStatus::Pending) {
+        if (! in_array($transaction->status, [TransactionStatus::Pending, TransactionStatus::PendingSuperadmin])) {
             throw new InvalidTransactionStateException($transaction);
         }
 
         return DB::transaction(function () use ($transaction, $adminUser) {
             // 1. Mark transaction as verified.
             $transaction->update([
-                'status'      => TransactionStatus::Verified,
-                'verified_by' => $adminUser->id,
-                'verified_at' => now(),
+                'status'                   => TransactionStatus::Approved,
+                'verified_by_superadmin_id' => $adminUser->id,
+                'verified_at'              => now(),
             ]);
 
             // 2. Activate the agent's user account.
@@ -176,15 +176,15 @@ class AgentRegistrationService
             );
         }
 
-        if ($transaction->status !== TransactionStatus::Pending) {
+        if (! in_array($transaction->status, [TransactionStatus::Pending, TransactionStatus::PendingSuperadmin])) {
             throw new InvalidTransactionStateException($transaction);
         }
 
         DB::transaction(function () use ($transaction, $adminUser) {
             $transaction->update([
-                'status'      => TransactionStatus::Rejected,
-                'verified_by' => $adminUser->id,
-                'verified_at' => now(),
+                'status'                   => TransactionStatus::Rejected,
+                'verified_by_superadmin_id' => $adminUser->id,
+                'verified_at'              => now(),
             ]);
 
             Log::warning("AgentRegistration: Rejected — Transaction[{$transaction->id}] by Admin[{$adminUser->id}].");

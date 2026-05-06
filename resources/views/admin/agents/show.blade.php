@@ -3,6 +3,9 @@
 @section('title', 'Detail Agen — ' . $agent->nama)
 
 @section('content')
+@php
+    $baseRoute = auth()->user()->isSuperAdmin() ? 'superadmin.agents' : 'admin.agents';
+@endphp
     {{-- ── Breadcrumb / Header ───────────────────────────────────────────────- --}}
     <div class="page-header d-print-none">
         <div class="container-xl">
@@ -10,15 +13,16 @@
                 <div class="col mb-3">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-1">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('admin.agents.index') }}">Agen</a></li>
+                            <li class="breadcrumb-item"><a href="{{ auth()->user()->isSuperAdmin() ? route('superadmin.dashboard') : route('admin.dashboard') }}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route($baseRoute . '.index') }}">Agen</a></li>
                             <li class="breadcrumb-item active">{{ $agent->nama }}</li>
                         </ol>
                     </nav>
                     <h2 class="page-title">Profil Agen</h2>
                 </div>
                 <div class="col-auto ms-auto d-flex gap-2 flex-wrap">
-                    <a href="{{ route('admin.agents.edit', $agent) }}" class="btn btn-outline-primary" id="btn-edit-agent">
+                    @can('edit-agent')
+                    <a href="{{ route($baseRoute . '.edit', $agent) }}" class="btn btn-outline-primary" id="btn-edit-agent">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24"
                             stroke-width="2" stroke="currentColor" fill="none">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -27,10 +31,11 @@
                         </svg>
                         Edit
                     </a>
+                    @endcan
 
                     {{-- Approve / Suspend action --}}
                     @if(!$agent->user?->is_active)
-                        <form method="POST" action="{{ route('admin.agents.approve', $agent) }}" id="form-approve-agent">
+                        <form method="POST" action="{{ route($baseRoute . '.approve', $agent) }}" id="form-approve-agent">
                             @csrf
                             <button type="submit" class="btn btn-success" id="btn-approve-agent">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24"
@@ -42,7 +47,7 @@
                             </button>
                         </form>
                     @else
-                        <form method="POST" action="{{ route('admin.agents.suspend', $agent) }}" id="form-suspend-agent"
+                        <form method="POST" action="{{ route($baseRoute . '.suspend', $agent) }}" id="form-suspend-agent"
                             onsubmit="return confirm('Yakin ingin mensuspend {{ $agent->nama }}?')">
                             @csrf
                             <button type="submit" class="btn btn-warning" id="btn-suspend-agent">
@@ -108,7 +113,7 @@
                         <dt class="col-6 text-muted">Upline</dt>
                         <dd class="col-6">
                             @if($agent->upline)
-                                <a href="{{ route('admin.agents.show', $agent->upline) }}" class="text-decoration-none">
+                                <a href="{{ route($baseRoute . '.show', $agent->upline) }}" class="text-decoration-none">
                                     {{ $agent->upline->nama }}
                                 </a>
                             @else
@@ -270,7 +275,7 @@
                             <td class="text-center text-muted small">{{ $dl->downlines_count }}</td>
                             <td class="text-muted small">{{ $dl->joined_at?->format('d M Y') ?? '—' }}</td>
                             <td class="text-end">
-                                <a href="{{ route('admin.agents.show', $dl) }}" class="btn btn-sm btn-ghost-primary">
+                                <a href="{{ route($baseRoute . '.show', $dl) }}" class="btn btn-sm btn-ghost-primary">
                                     Buka
                                 </a>
                             </td>

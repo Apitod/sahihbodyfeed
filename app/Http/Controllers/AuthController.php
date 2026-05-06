@@ -30,6 +30,10 @@ class AuthController extends Controller
                 return back()->with('error', 'Akun Anda belum aktif. Menunggu verifikasi pembayaran oleh Admin.');
             }
 
+            if ($user->isSuperAdmin()) {
+                return redirect()->intended(route('superadmin.dashboard'));
+            }
+
             if ($user->isAdmin()) {
                 return redirect()->intended(route('admin.dashboard'));
             }

@@ -144,10 +144,12 @@
                 </div>
 
                 <div class="collapse navbar-collapse" id="sidebar-menu">
-                    @if(auth()->user()->isAgent())
-                        @include('layouts.agent_sidebar')
+                    @if(auth()->user()->isSuperAdmin())
+                        @include('layouts.superadmin_sidebar')
                     @elseif(auth()->user()->isAdmin())
                         @include('layouts.admin_sidebar')
+                    @else
+                        @include('layouts.agent_sidebar')
                     @endif
                 </div>
             </div>

@@ -77,43 +77,41 @@ class VerificationController extends Controller
             ->with('success', "Repeat Order untuk agen '{$agent->nama}' (@{$agent->user->username}) berhasil dibuat dan menunggu verifikasi.");
     }
 
+    /**
+     * Admin Tier-2: first-level review.
+     * Only moves the transaction to 'pending_superadmin'.
+     * Commission distribution happens only after Superadmin gives final approval.
+     */
     public function approveTransaction(Transaction $transaction, Request $request)
     {
-        try {
-            $adminUser = $request->user();
-            
-            if ($transaction->type === TransactionType::NewAgent) {
-                // FC1 Branch
-                $this->registrationService->approveRegistration($transaction, $adminUser);
-                $message = "Registrasi Agen {$transaction->agent->nama} berhasil diverifikasi. Komisi telah dibagikan.";
-            } elseif ($transaction->type === TransactionType::RepeatOrder) {
-                // FC2 Branch
-                $this->repeatOrderService->approveOrder($transaction, $adminUser);
-                $message = "Repeat Order dari {$transaction->agent->nama} berhasil diverifikasi. Poin bertambah dan komisi dibagikan.";
-            } else {
-                throw new \Exception("Tipe transaksi tidak dikenali.");
-            }
-
-            return back()->with('success', $message);
-        } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
+        if ($transaction->status !== \App\Enums\TransactionStatus::Pending) {
+            return back()->with('error', 'Hanya transaksi berstatus Pending yang dapat direview.');
         }
+
+        $transaction->update([
+            'status'                 => \App\Enums\TransactionStatus::PendingSuperadmin,
+            'verified_by_admin_id'  => $request->user()->id,
+        ]);
+
+        return back()->with('success', "Transaksi #{$transaction->id} telah diverifikasi. Menunggu persetujuan akhir Superadmin.");
     }
 
+    /**
+     * Admin Tier-2: reject directly (no need to escalate to Superadmin for rejections).
+     */
     public function rejectTransaction(Transaction $transaction, Request $request)
     {
-        try {
-            $adminUser = $request->user();
-
-            if ($transaction->type === TransactionType::NewAgent) {
-                $this->registrationService->rejectRegistration($transaction, $adminUser);
-            } elseif ($transaction->type === TransactionType::RepeatOrder) {
-                $this->repeatOrderService->rejectOrder($transaction, $adminUser);
-            }
-
-            return back()->with('success', "Transaksi #{$transaction->id} berhasil ditolak.");
-        } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
+        if ($transaction->status !== \App\Enums\TransactionStatus::Pending) {
+            return back()->with('error', 'Hanya transaksi berstatus Pending yang dapat ditolak oleh Admin.');
         }
+
+        // Admin can reject directly without superadmin — it goes straight to Rejected.
+        if ($transaction->type === TransactionType::NewAgent) {
+            $this->registrationService->rejectRegistration($transaction, $request->user());
+        } elseif ($transaction->type === TransactionType::RepeatOrder) {
+            $this->repeatOrderService->rejectOrder($transaction, $request->user());
+        }
+
+        return back()->with('success', "Transaksi #{$transaction->id} berhasil ditolak.");
     }
 }

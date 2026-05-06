@@ -172,7 +172,9 @@ class AgentController extends Controller
             Log::info("Admin created agent [{$validated['nama']}] with user [{$user->id}].");
         });
 
-        return redirect()->route('admin.agents.index')
+        $baseRoute = auth()->user()->isSuperAdmin() ? 'superadmin.agents' : 'admin.agents';
+
+        return redirect()->route($baseRoute . '.index')
             ->with('success', "Agen '{$validated['nama']}' berhasil dibuat.");
     }
 
@@ -228,7 +230,9 @@ class AgentController extends Controller
 
         Log::info("Admin updated agent [{$agent->id}].");
 
-        return redirect()->route('admin.agents.show', $agent)
+        $baseRoute = auth()->user()->isSuperAdmin() ? 'superadmin.agents' : 'admin.agents';
+
+        return redirect()->route($baseRoute . '.show', $agent)
             ->with('success', 'Data agen berhasil diperbarui.');
     }
 
@@ -258,7 +262,9 @@ class AgentController extends Controller
 
         Log::warning("Admin deleted agent [{$nama}].");
 
-        return redirect()->route('admin.agents.index')
+        $baseRoute = auth()->user()->isSuperAdmin() ? 'superadmin.agents' : 'admin.agents';
+
+        return redirect()->route($baseRoute . '.index')
             ->with('success', "Agen '{$nama}' telah dihapus.");
     }
 

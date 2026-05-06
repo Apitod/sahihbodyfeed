@@ -3,6 +3,9 @@
 @section('title', 'Tambah Agen Baru')
 
 @section('content')
+@php
+    $baseRoute = auth()->user()->isSuperAdmin() ? 'superadmin.agents' : 'admin.agents';
+@endphp
 {{-- ── Page Header ──────────────────────────────────────────────────────── --}}
 <div class="page-header d-print-none">
     <div class="container-xl">
@@ -10,7 +13,7 @@
             <div class="col">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-1">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.agents.index') }}">Agen</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route($baseRoute . '.index') }}">Agen</a></li>
                         <li class="breadcrumb-item active">Tambah Baru</li>
                     </ol>
                 </nav>
@@ -26,7 +29,7 @@
     </div>
 </div>
 
-<form method="POST" action="{{ route('admin.agents.store') }}" id="create-agent-form">
+<form method="POST" action="{{ route($baseRoute . '.store') }}" id="create-agent-form">
 @csrf
 <div class="row g-4">
 
@@ -217,7 +220,7 @@
                         </svg>
                         Buat Agen
                     </button>
-                    <a href="{{ route('admin.agents.index') }}" class="btn btn-outline-secondary">Batal</a>
+                    <a href="{{ route($baseRoute . '.index') }}" class="btn btn-outline-secondary">Batal</a>
                 </div>
                 <p class="text-muted small mt-3 mb-0 text-center">
                     Agen akan langsung aktif setelah dibuat oleh admin.

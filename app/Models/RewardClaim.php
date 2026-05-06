@@ -13,7 +13,8 @@ class RewardClaim extends Model
         'agent_id',
         'reward_id',
         'status',
-        'approved_by',
+        'verified_by_admin_id',
+        'approved_by_superadmin_id',
         'approved_at',
     ];
 
@@ -45,12 +46,28 @@ class RewardClaim extends Model
     }
 
     /**
-     * The admin user who approved or rejected this claim.
+     * The admin (Tier 2) who did the initial review of this claim.
+     */
+    public function adminVerifier(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by_admin_id');
+    }
+
+    /**
+     * The superadmin (Tier 1) who gave final approval or rejection for this claim.
      * Null while the claim is still pending.
+     */
+    public function superadminApprover(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by_superadmin_id');
+    }
+
+    /**
+     * @deprecated Use superadminApprover() for clarity with the new 3-tier system.
      */
     public function approver(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'approved_by');
+        return $this->superadminApprover();
     }
 
     /**

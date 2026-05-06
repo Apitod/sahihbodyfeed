@@ -3,6 +3,9 @@
 @section('title', 'Edit Agen — ' . $agent->nama)
 
 @section('content')
+@php
+    $baseRoute = auth()->user()->isSuperAdmin() ? 'superadmin.agents' : 'admin.agents';
+@endphp
 {{-- ── Page Header ──────────────────────────────────────────────────────── --}}
 <div class="page-header d-print-none">
     <div class="container-xl">
@@ -10,8 +13,8 @@
             <div class="col">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-1">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.agents.index') }}">Agen</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.agents.show', $agent) }}">{{ $agent->nama }}</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route($baseRoute . '.index') }}">Agen</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route($baseRoute . '.show', $agent) }}">{{ $agent->nama }}</a></li>
                         <li class="breadcrumb-item active">Edit</li>
                     </ol>
                 </nav>
@@ -21,7 +24,7 @@
     </div>
 </div>
 
-<form method="POST" action="{{ route('admin.agents.update', $agent) }}"
+<form method="POST" action="{{ route($baseRoute . '.update', $agent) }}"
       id="edit-agent-form">
 @csrf
 @method('PUT')
@@ -209,7 +212,7 @@
                         </svg>
                         Simpan Perubahan
                     </button>
-                    <a href="{{ route('admin.agents.show', $agent) }}" class="btn btn-outline-secondary">Batal</a>
+                    <a href="{{ route($baseRoute . '.show', $agent) }}" class="btn btn-outline-secondary">Batal</a>
                 </div>
             </div>
         </div>

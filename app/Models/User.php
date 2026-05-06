@@ -44,21 +44,35 @@ class User extends Authenticatable
     }
 
     /**
-     * Transactions this admin user has verified.
-     * (verified_by FK on transactions table)
+     * Transactions this user has verified as Admin (Tier 2).
      */
-    public function verifiedTransactions(): HasMany
+    public function verifiedAsAdminTransactions(): HasMany
     {
-        return $this->hasMany(Transaction::class, 'verified_by');
+        return $this->hasMany(Transaction::class, 'verified_by_admin_id');
     }
 
     /**
-     * Reward claims this admin user has approved or rejected.
-     * (approved_by FK on reward_claims table)
+     * Transactions this user has verified as Superadmin (Tier 1).
+     */
+    public function verifiedAsSuperadminTransactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class, 'verified_by_superadmin_id');
+    }
+
+    /**
+     * Reward claims this user has reviewed as Admin (Tier 2).
+     */
+    public function reviewedRewardClaims(): HasMany
+    {
+        return $this->hasMany(RewardClaim::class, 'verified_by_admin_id');
+    }
+
+    /**
+     * Reward claims this user has approved/rejected as Superadmin (Tier 1).
      */
     public function approvedRewardClaims(): HasMany
     {
-        return $this->hasMany(RewardClaim::class, 'approved_by');
+        return $this->hasMany(RewardClaim::class, 'approved_by_superadmin_id');
     }
 
     // ─── Helper Methods ───────────────────────────────────────────────────────
@@ -67,6 +81,11 @@ class User extends Authenticatable
      * Convenience check using the cached role column — avoids a pivot-table join.
      * Always keep in sync with Spatie role assignment.
      */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === UserRole::SuperAdmin;
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === UserRole::Admin;
@@ -75,5 +94,13 @@ class User extends Authenticatable
     public function isAgent(): bool
     {
         return $this->role === UserRole::Agent;
+    }
+
+    /**
+     * Returns true for both superadmin and admin (non-agent staff).
+     */
+    public function isStaff(): bool
+    {
+        return in_array($this->role, [UserRole::SuperAdmin, UserRole::Admin]);
     }
 }

@@ -108,7 +108,7 @@ class RewardClaimService
      */
     public function approveClaim(RewardClaim $claim, User $adminUser): void
     {
-        if ($claim->status !== ClaimStatus::Pending) {
+        if (! in_array($claim->status, [ClaimStatus::Pending, ClaimStatus::PendingSuperadmin])) {
             throw new \InvalidArgumentException(
                 "Claim[{$claim->id}] sudah dalam status '{$claim->status->value}', tidak bisa di-approve ulang."
             );
@@ -122,9 +122,9 @@ class RewardClaimService
 
             // ── STEP 1: Mark claim as approved ──────────────────────────────
             $claim->update([
-                'status'      => ClaimStatus::Approved,
-                'approved_by' => $adminUser->id,
-                'approved_at' => now(),
+                'status'                    => ClaimStatus::Approved,
+                'approved_by_superadmin_id' => $adminUser->id,
+                'approved_at'               => now(),
             ]);
 
             Log::info("RewardClaim: Approved — Claim[{$claim->id}] Agent[{$agent->id}] Reward[{$reward->id}] ({$reward->name}) by Admin[{$adminUser->id}].");
@@ -216,7 +216,7 @@ class RewardClaimService
      */
     public function rejectClaim(RewardClaim $claim, User $adminUser): void
     {
-        if ($claim->status !== ClaimStatus::Pending) {
+        if (! in_array($claim->status, [ClaimStatus::Pending, ClaimStatus::PendingSuperadmin])) {
             throw new \InvalidArgumentException(
                 "Claim[{$claim->id}] sudah dalam status '{$claim->status->value}', tidak bisa di-reject."
             );
@@ -224,9 +224,9 @@ class RewardClaimService
 
         DB::transaction(function () use ($claim, $adminUser) {
             $claim->update([
-                'status'      => ClaimStatus::Rejected,
-                'approved_by' => $adminUser->id,
-                'approved_at' => now(),
+                'status'                    => ClaimStatus::Rejected,
+                'approved_by_superadmin_id' => $adminUser->id,
+                'approved_at'               => now(),
             ]);
 
             Log::warning("RewardClaim: Rejected — Claim[{$claim->id}] by Admin[{$adminUser->id}].");
