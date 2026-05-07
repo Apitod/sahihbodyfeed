@@ -19,6 +19,8 @@ class Commission extends Model
         'type',
         'status',
         'paid_at',
+        'transfer_proof',
+        'payment_notes',
     ];
 
     protected function casts(): array

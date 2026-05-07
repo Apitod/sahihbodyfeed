@@ -35,6 +35,7 @@ Route::middleware(['auth', 'role:agent'])->prefix('agent')->name('agent.')->grou
     // Route::post('/transactions', [Agent\TransactionController::class, 'storeRepeatOrder'])->name('repeat_order.store');
     Route::get('/transactions', [Agent\TransactionController::class, 'index'])->name('transactions.index');
     Route::get('/commissions', [Agent\CommissionController::class, 'index'])->name('commissions');
+    Route::get('/commissions/{commission}/invoice', [Agent\CommissionController::class, 'previewInvoice'])->name('commissions.invoice');
     Route::get('/rewards', [Agent\RewardController::class, 'index'])->name('rewards');
     Route::post('/rewards/{reward}/claim', [Agent\RewardController::class, 'claim'])->name('rewards.claim');
     Route::get('/matching-rewards', [Agent\MatchingRewardController::class, 'index'])->name('matching_rewards');
@@ -70,6 +71,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/commissions', [Admin\CommissionReportController::class, 'index'])->name('commissions.index');
     Route::get('/commissions/pdf', [Admin\CommissionReportController::class, 'downloadPdf'])->name('commissions.pdf');
     Route::post('/commissions/mark-paid', [Admin\CommissionReportController::class, 'markAsPaid'])->name('commissions.mark-paid');
+    Route::post('/commissions/{commission}/upload-proof', [Admin\CommissionReportController::class, 'uploadProof'])->name('commissions.upload-proof');
+    Route::get('/commissions/{commission}/invoice', [Admin\CommissionReportController::class, 'downloadInvoice'])->name('commissions.invoice');
+    Route::get('/commissions/{commission}/invoice/preview', [Admin\CommissionReportController::class, 'previewInvoice'])->name('commissions.invoice.preview');
 });
 
 // Superadmin Routes (Tier 1) — full access + final approval + admin management
@@ -94,6 +98,9 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('supe
     Route::get('/commissions', [Admin\CommissionReportController::class, 'index'])->name('commissions.index');
     Route::get('/commissions/pdf', [Admin\CommissionReportController::class, 'downloadPdf'])->name('commissions.pdf');
     Route::post('/commissions/mark-paid', [Admin\CommissionReportController::class, 'markAsPaid'])->name('commissions.mark-paid');
+    Route::post('/commissions/{commission}/upload-proof', [Admin\CommissionReportController::class, 'uploadProof'])->name('commissions.upload-proof');
+    Route::get('/commissions/{commission}/invoice', [Admin\CommissionReportController::class, 'downloadInvoice'])->name('commissions.invoice');
+    Route::get('/commissions/{commission}/invoice/preview', [Admin\CommissionReportController::class, 'previewInvoice'])->name('commissions.invoice.preview');
 
     // ─── Admin Management (Superadmin only) ───────────────────────────────────
     Route::get('/admins',                       [SuperadminAdminController::class, 'index'])->name('admins.index');

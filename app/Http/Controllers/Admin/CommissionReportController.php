@@ -8,6 +8,7 @@ use App\Models\Commission;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class CommissionReportController extends Controller
 {
@@ -84,5 +85,61 @@ class CommissionReportController extends Controller
         });
 
         return back()->with('success', "Sebanyak {$count} komisi berhasil ditandai sebagai 'Paid'.");
+    }
+
+    /**
+     * Upload bukti transfer untuk satu komisi individual.
+     */
+    public function uploadProof(Request $request, Commission $commission)
+    {
+        $request->validate([
+            'transfer_proof' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'payment_notes'  => 'nullable|string|max:500',
+        ]);
+
+        // Hapus file lama jika ada
+        if ($commission->transfer_proof && Storage::disk('public')->exists($commission->transfer_proof)) {
+            Storage::disk('public')->delete($commission->transfer_proof);
+        }
+
+        $path = $request->file('transfer_proof')->store('transfer_proofs', 'public');
+
+        $commission->update([
+            'transfer_proof' => $path,
+            'payment_notes'  => $request->input('payment_notes'),
+            // Otomatis tandai paid jika belum
+            'status'  => CommissionStatus::Paid,
+            'paid_at' => $commission->paid_at ?? now(),
+        ]);
+
+        return back()->with('success', "Bukti transfer untuk komisi #{$commission->id} berhasil diupload.");
+    }
+
+    /**
+     * Download invoice komisi individual sebagai PDF.
+     */
+    public function downloadInvoice(Commission $commission)
+    {
+        $commission->load('recipient');
+        $date = now()->timezone('Asia/Makassar')->format('d M Y H:i');
+
+        $pdf = Pdf::loadView('admin.commissions.invoice_pdf', compact('commission', 'date'))
+            ->setPaper('a5', 'portrait');
+
+        return $pdf->download("invoice_komisi_{$commission->id}.pdf");
+    }
+
+    /**
+     * Preview invoice komisi individual di browser (inline).
+     */
+    public function previewInvoice(Commission $commission)
+    {
+        $commission->load('recipient');
+        $date = now()->timezone('Asia/Makassar')->format('d M Y H:i');
+
+        $pdf = Pdf::loadView('admin.commissions.invoice_pdf', compact('commission', 'date'))
+            ->setPaper('a5', 'portrait');
+
+        return $pdf->stream("invoice_komisi_{$commission->id}.pdf");
     }
 }
