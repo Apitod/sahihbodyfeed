@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Agent;
 use App\Http\Controllers\Superadmin;
+use App\Http\Controllers\Superadmin\AdminController as SuperadminAdminController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -93,4 +94,12 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('supe
     Route::get('/commissions', [Admin\CommissionReportController::class, 'index'])->name('commissions.index');
     Route::get('/commissions/pdf', [Admin\CommissionReportController::class, 'downloadPdf'])->name('commissions.pdf');
     Route::post('/commissions/mark-paid', [Admin\CommissionReportController::class, 'markAsPaid'])->name('commissions.mark-paid');
+
+    // ─── Admin Management (Superadmin only) ───────────────────────────────────
+    Route::get('/admins',                       [SuperadminAdminController::class, 'index'])->name('admins.index');
+    Route::post('/admins',                      [SuperadminAdminController::class, 'store'])->name('admins.store');
+    Route::put('/admins/{admin}',               [SuperadminAdminController::class, 'update'])->name('admins.update');
+    Route::post('/admins/{admin}/activate',     [SuperadminAdminController::class, 'activate'])->name('admins.activate');
+    Route::post('/admins/{admin}/suspend',      [SuperadminAdminController::class, 'suspend'])->name('admins.suspend');
+    Route::delete('/admins/{admin}',            [SuperadminAdminController::class, 'destroy'])->name('admins.destroy');
 });

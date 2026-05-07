@@ -3,6 +3,9 @@
 @section('title', 'Laporan Komisi')
 
 @section('content')
+@php
+    $baseRoute = auth()->user()->isSuperAdmin() ? 'superadmin.commissions' : 'admin.commissions';
+@endphp
 <div class="page-header d-print-none">
     <div class="container-xl">
         <div class="row g-2 align-items-center">
@@ -14,12 +17,12 @@
             </div>
             <div class="col-auto ms-auto d-print-none">
                 <div class="d-flex gap-2">
-                    <a href="{{ route('admin.commissions.pdf', ['status' => $status]) }}" class="btn btn-primary" target="_blank">
+                    <a href="{{ route($baseRoute . '.pdf', ['status' => $status]) }}" class="btn btn-primary" target="_blank">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M12 17v-6" /><path d="M9.5 14.5l2.5 2.5l2.5 -2.5" /></svg>
                         Download PDF {{ $status ? '(' . ucfirst($status) . ')' : '(Semua)' }}
                     </a>
                     @if($status === 'pending' && $countPending > 0)
-                        <form action="{{ route('admin.commissions.mark-paid') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin sudah mentransfer semua komisi pending? Tindakan ini akan mengubah status komisi menjadi Paid.');">
+                        <form action="{{ route($baseRoute . '.mark-paid') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin sudah mentransfer semua komisi pending? Tindakan ini akan mengubah status komisi menjadi Paid.');">
                             @csrf
                             <button type="submit" class="btn btn-success">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
@@ -35,7 +38,7 @@
 
 <div class="card border-0 shadow-sm mb-3">
     <div class="card-body">
-        <form method="GET" action="{{ route('admin.commissions.index') }}" class="row g-2 align-items-end">
+        <form method="GET" action="{{ route($baseRoute . '.index') }}" class="row g-2 align-items-end">
             <div class="col-12 col-md-4">
                 <label class="form-label">Status Komisi</label>
                 <select name="status" class="form-select" onchange="this.form.submit()">

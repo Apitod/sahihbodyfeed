@@ -366,6 +366,9 @@
                     <a href="{{ route('superadmin.agents.index') }}" class="btn btn-light rounded-3 fw-bold text-start small">
                         👥 Manajemen Agen (Full)
                     </a>
+                    <a href="{{ route('superadmin.admins.index') }}" class="btn btn-light rounded-3 fw-bold text-start small">
+                        🛡️ Manajemen Admin
+                    </a>
                     <a href="{{ route('superadmin.commissions.index') }}" class="btn btn-light rounded-3 fw-bold text-start small">
                         💸 Laporan & Bayar Komisi
                     </a>
