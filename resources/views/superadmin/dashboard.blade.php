@@ -9,7 +9,7 @@
     .metric-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
     .section-title { font-weight: 800; font-size: 1rem; letter-spacing: -0.01em; }
     .chart-bar-wrap { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
-    .chart-bar { flex: 1; border-radius: 6px 6px 0 0; min-width: 0; transition: opacity 0.2s; position: relative; cursor: default; }
+    .chart-bar { width: 100%; border-radius: 6px 6px 0 0; min-width: 0; transition: opacity 0.2s; position: relative; cursor: default; }
     .chart-bar:hover { opacity: 0.8; }
     .chart-bar .bar-tooltip { display: none; position: absolute; bottom: 105%; left: 50%; transform: translateX(-50%);
         background: #1e293b; color: #fff; font-size: 0.65rem; white-space: nowrap; padding: 3px 7px; border-radius: 6px; font-weight: 700; z-index: 10; }
