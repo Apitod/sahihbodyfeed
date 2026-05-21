@@ -58,12 +58,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/verifications/rewards/{claim}/approve', [Admin\RewardVerificationController::class, 'approve'])->name('rewards.approve');
     Route::post('/verifications/rewards/{claim}/reject', [Admin\RewardVerificationController::class, 'reject'])->name('rewards.reject');
 
-    // ─── Agent Management (Admin: Create only, NO edit/delete of master data) ───────
+    // ─── Agent Management (Admin: Create and Edit) ─────────────────────────
     Route::get('/agents', [Admin\AgentController::class, 'index'])->name('agents.index');
     Route::get('/agents/create', [Admin\AgentController::class, 'create'])->name('agents.create');
     Route::post('/agents', [Admin\AgentController::class, 'store'])->name('agents.store');
     Route::get('/agents/{agent}', [Admin\AgentController::class, 'show'])->name('agents.show');
-    // NOTE: edit, update, destroy routes are intentionally REMOVED for Admin — Superadmin only.
+    Route::get('/agents/{agent}/edit', [Admin\AgentController::class, 'edit'])->name('agents.edit');
+    Route::put('/agents/{agent}', [Admin\AgentController::class, 'update'])->name('agents.update');
     Route::post('/agents/{agent}/approve', [Admin\AgentController::class, 'approve'])->name('agents.approve');
     Route::post('/agents/{agent}/suspend', [Admin\AgentController::class, 'suspend'])->name('agents.suspend');
 

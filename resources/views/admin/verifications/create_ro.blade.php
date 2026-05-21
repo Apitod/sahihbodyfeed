@@ -6,16 +6,16 @@
 {{-- ── Page Header ──────────────────────────────────────────────────────── --}}
 <div class="page-header d-print-none">
     <div class="container-xl">
-        <div class="row g-2 align-items-center">
+        <div class="align-items-center row g-2">
             <div class="col">
                 <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-1">
+                    <ol class="mb-1 breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('admin.verifications.transactions') }}">Verifikasi Transaksi</a></li>
                         <li class="breadcrumb-item active">Buat RO</li>
                     </ol>
                 </nav>
                 <h2 class="page-title">Buat Transaksi Repeat Order</h2>
-                <p class="text-muted small mt-1">
+                <p class="mt-1 text-muted small">
                     Admin membuat transaksi RO atas nama agen. Cari agen berdasarkan <strong>username</strong>.
                 </p>
             </div>
@@ -24,12 +24,12 @@
 </div>
 
 <div class="container-xl">
-    <div class="row justify-content-center">
+    <div class="justify-content-center row">
         <div class="col-12 col-lg-8">
 
             {{-- ── Flash / Validation Errors ───────────────────────────── --}}
             @if($errors->any())
-                <div class="alert alert-danger alert-dismissible mb-4" role="alert">
+                <div class="mb-4 alert alert-danger alert-dismissible" role="alert">
                     <ul class="mb-0">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -40,15 +40,15 @@
             @endif
 
             {{-- ── STEP 1: Cari Agen ───────────────────────────────────── --}}
-            <div class="card border-0 shadow-sm mb-4" id="step-search">
+            <div class="shadow-sm mb-4 border-0 card" id="step-search">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <span class="badge bg-blue me-2">1</span>
+                        <span class="bg-blue me-2 badge">1</span>
                         Cari Agen Berdasarkan Username
                     </h3>
                 </div>
                 <div class="card-body">
-                    <form method="GET" action="{{ route('admin.verifications.ro.create') }}" class="row g-2 align-items-end" id="search-agent-form">
+                    <form method="GET" action="{{ route('admin.verifications.ro.create') }}" class="align-items-end row g-2" id="search-agent-form">
                         <div class="col">
                             <label class="form-label required" for="username-search">Username Agen</label>
                             <input
@@ -64,7 +64,7 @@
                         </div>
                         <div class="col-auto">
                             <button type="submit" class="btn btn-primary" id="btn-cari-agen">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="10" cy="10" r="7"/><path d="M21 21l-6 -6"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="me-1 icon" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="10" cy="10" r="7"/><path d="M21 21l-6 -6"/></svg>
                                 Cari
                             </button>
                         </div>
@@ -73,29 +73,29 @@
                     {{-- Agent preview card --}}
                     @if($username)
                         @if($agent)
-                            <div class="alert alert-success d-flex align-items-center gap-3 mt-3 mb-0" id="agent-found-banner" role="alert">
-                                <span class="avatar avatar-sm rounded-circle bg-green-lt text-green fw-bold">
+                            <div class="d-flex align-items-center gap-3 mt-3 mb-0 alert alert-success" id="agent-found-banner" role="alert">
+                                <span class="bg-green-lt rounded-circle text-green avatar avatar-sm fw-bold">
                                     {{ strtoupper(substr($agent->nama, 0, 2)) }}
                                 </span>
                                 <div>
                                     <div class="fw-semibold">{{ $agent->nama }}</div>
-                                    <div class="small text-muted">
+                                    <div class="text-muted small">
                                         @username: <strong>{{ $agent->user->username }}</strong>
                                         &nbsp;·&nbsp;
                                         Status:
                                         @if($agent->user?->is_active)
-                                            <span class="badge bg-green-lt text-green">Aktif</span>
+                                            <span class="bg-green-lt text-green badge">Aktif</span>
                                         @else
-                                            <span class="badge bg-red-lt text-red">Tidak Aktif</span>
+                                            <span class="bg-red-lt text-red badge">Tidak Aktif</span>
                                         @endif
                                         &nbsp;·&nbsp;
-                                        Pangkat: <span class="badge bg-blue-lt text-blue">{{ $agent->status->label() }}</span>
+                                        Pangkat: <span class="bg-blue-lt text-blue badge">{{ $agent->status->label() }}</span>
                                     </div>
                                 </div>
                             </div>
                         @else
-                            <div class="alert alert-warning mt-3 mb-0" role="alert">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/><path d="M12 16h.01"/></svg>
+                            <div class="mt-3 mb-0 alert alert-warning" role="alert">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="me-1 icon" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/><path d="M12 16h.01"/></svg>
                                 Agen dengan username <strong>"{{ $username }}"</strong> tidak ditemukan.
                             </div>
                         @endif
@@ -105,10 +105,10 @@
 
             {{-- ── STEP 2: Form Buat RO ─────────────────────────────────── --}}
             @if($agent && $agent->user?->is_active)
-            <div class="card border-0 shadow-sm" id="step-form">
+            <div class="shadow-sm border-0 card" id="step-form">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <span class="badge bg-blue me-2">2</span>
+                        <span class="bg-blue me-2 badge">2</span>
                         Detail Transaksi Repeat Order
                     </h3>
                 </div>
@@ -120,24 +120,24 @@
                         <input type="hidden" name="username" value="{{ $agent->user->username }}">
 
                         {{-- Info baris --}}
-                        <div class="row g-3 mb-4">
+                        <div class="mb-4 row g-3">
                             <div class="col-6 col-md-4">
-                                <div class="text-muted small mb-1">Nama Agen</div>
+                                <div class="mb-1 text-muted small">Nama Agen</div>
                                 <div class="fw-semibold">{{ $agent->nama }}</div>
                             </div>
                             <div class="col-6 col-md-4">
-                                <div class="text-muted small mb-1">Username</div>
+                                <div class="mb-1 text-muted small">Username</div>
                                 <code>{{ $agent->user->username }}</code>
                             </div>
                             <div class="col-6 col-md-4">
-                                <div class="text-muted small mb-1">Nominal RO</div>
-                                <div class="fw-bold text-green fs-5">Rp{{ number_format($amount, 0, ',', '.') }}</div>
+                                <div class="mb-1 text-muted small">Nominal RO</div>
+                                <div class="text-green fw-bold fs-5">Rp{{ number_format($amount, 0, ',', '.') }}</div>
                             </div>
                         </div>
 
                         {{-- Upload bukti bayar --}}
                         <div class="mb-4">
-                            <label class="form-label required" for="proof-upload">Bukti Pembayaran</label>
+                            <label class="form-label" for="proof-upload">Bukti Pembayaran</label>
                             <input
                                 type="file"
                                 id="proof-upload"
@@ -154,17 +154,17 @@
 
                         {{-- Preview gambar --}}
                         <div id="img-preview-wrap" class="mb-4 d-none">
-                            <div class="text-muted small mb-1">Preview</div>
+                            <div class="mb-1 text-muted small">Preview</div>
                             <img id="img-preview" src="" alt="Preview bukti bayar"
-                                class="img-fluid rounded border" style="max-height:260px; object-fit:contain;">
+                                class="border rounded img-fluid" style="max-height:260px; object-fit:contain;">
                         </div>
 
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-success px-4" id="btn-submit-ro">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10"/></svg>
+                            <button type="submit" class="px-4 btn btn-success" id="btn-submit-ro">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="me-1 icon" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10"/></svg>
                                 Buat Transaksi RO
                             </button>
-                            <a href="{{ route('admin.verifications.transactions') }}" class="btn btn-outline-secondary">Batal</a>
+                            <a href="{{ route('admin.verifications.transactions') }}" class="btn-outline-secondary btn">Batal</a>
                         </div>
                     </form>
                 </div>

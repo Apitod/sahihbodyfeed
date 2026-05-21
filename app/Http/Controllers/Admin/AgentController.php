@@ -13,6 +13,7 @@ use App\Services\AgentRegistrationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -185,6 +186,8 @@ class AgentController extends Controller
      */
     public function edit(Agent $agent): View
     {
+        Gate::authorize('edit-agent');
+
         $agent->load('user');
         $uplineAgents = Agent::with('user')
             ->where('id', '!=', $agent->id)
@@ -202,6 +205,8 @@ class AgentController extends Controller
      */
     public function update(Request $request, Agent $agent): RedirectResponse
     {
+        Gate::authorize('edit-agent');
+
         $validated = $request->validate([
             // ── Personal data ─────────────────────────────────────────────────────
             'nama'              => 'required|string|max:120',

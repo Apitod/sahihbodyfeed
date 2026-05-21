@@ -54,7 +54,7 @@ class VerificationController extends Controller
     {
         $validated = $request->validate([
             'username'         => 'required|string|exists:users,username',
-            'proof_of_payment' => 'required|image|max:2048',
+            'proof_of_payment' => 'nullable|image|max:2048',
         ]);
 
         $agent = \App\Models\Agent::whereHas('user', fn ($q) => $q->where('username', $validated['username']))
@@ -69,12 +69,16 @@ class VerificationController extends Controller
             return back()->withErrors(['username' => 'Akun agen ini tidak aktif.'])->withInput();
         }
 
-        $path = $request->file('proof_of_payment')->store('payments', 'public');
+        if($request->hasFile('proof_of_payment')) {
+            $path = $request->file('proof_of_payment')->store('payments', 'public');
+        } else {
+            $path = '';
+        }
 
         $this->repeatOrderService->submitOrder($agent, $path);
 
         return redirect()->route('admin.verifications.transactions')
-            ->with('success', "Repeat Order untuk agen '{$agent->nama}' (@{$agent->user->username}) berhasil dibuat dan menunggu verifikasi.");
+            ->with('success', "Repeat Order untuk agen '{$agent->nama}' (@{$agent->user->username}) berhasil dibuat.");
     }
 
     /**

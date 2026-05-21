@@ -34,8 +34,8 @@ class AppServiceProvider extends ServiceProvider
 
         // ─── Agent Management ─────────────────────────────────────────────────
 
-        // Only Superadmin can edit / delete master agent data.
-        Gate::define('edit-agent', fn (User $user) => $user->isSuperAdmin());
+        // Only Superadmin or Admin can edit agent data. Only Superadmin can delete.
+        Gate::define('edit-agent', fn (User $user) => $user->isStaff());
         Gate::define('delete-agent', fn (User $user) => $user->isSuperAdmin());
 
         // Admin & Superadmin can create / view agents.
