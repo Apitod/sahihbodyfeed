@@ -21,6 +21,13 @@
                     </svg>
                     Print
                 </button>
+                <a href="{{ route('admin.verifications.agent.create') }}" class="btn btn-success d-print-none" id="btn-verifikasi-agent">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M9 12l2 2l4 -4"/><path d="M12 3a9 9 0 1 0 9 9"/>
+                    </svg>
+                    Verifikasi Agent
+                </a>
                 <a href="{{ route('admin.verifications.ro.create') }}" class="btn btn-primary d-print-none" id="btn-buat-ro">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>

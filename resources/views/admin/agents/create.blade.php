@@ -22,7 +22,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-blue me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/>
                     </svg>
-                    Agen dibuat oleh admin langsung aktif. Upload bukti pembayaran Rp2.650.000 wajib disertakan — riwayat transaksi akan otomatis tercatat.
+                    Agen dibuat aktif, tetapi status verifikasi agent tetap belum selesai sampai Verifikasi Agent Rp2.650.000 disetujui.
                 </p>
             </div>
         </div>
@@ -210,45 +210,6 @@
             </div>
         </div>
 
-        {{-- Bukti Pembayaran --}}
-        <div class="card border-0 shadow-sm mt-4">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-orange" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M12 11v6"/><path d="M9.5 13.5l2.5 -2.5l2.5 2.5"/>
-                    </svg>
-                    Bukti Pembayaran
-                    <span class="badge bg-red-lt ms-2">Wajib</span>
-                </h3>
-            </div>
-            <div class="card-body">
-                <div class="mb-2">
-                    <label class="form-label required" for="input-proof">
-                        Bukti Transfer Rp2.650.000
-                    </label>
-                    <input type="file"
-                        class="form-control @error('proof_of_payment') is-invalid @enderror"
-                        id="input-proof"
-                        name="proof_of_payment"
-                        accept="image/jpeg,image/png,image/webp,application/pdf"
-                        required>
-                    @error('proof_of_payment')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                    <div class="form-hint">Format: JPG, PNG, WebP, atau PDF. Maks. 5 MB.</div>
-                </div>
-
-                {{-- Preview gambar (JPG/PNG/WebP) --}}
-                <div id="proof-preview-wrapper" class="d-none mt-3">
-                    <img id="proof-preview-img"
-                        src=""
-                        alt="Preview Bukti"
-                        class="img-fluid rounded border"
-                        style="max-height:200px;">
-                </div>
-            </div>
-        </div>
-
         {{-- Submit card --}}
         <div class="card border-0 shadow-sm mt-4">
             <div class="card-body">
@@ -262,7 +223,7 @@
                     <a href="{{ route($baseRoute . '.index') }}" class="btn btn-outline-secondary">Batal</a>
                 </div>
                 <p class="text-muted small mt-3 mb-0 text-center">
-                    Agen aktif langsung. Transaksi Rp2.650.000 tercatat otomatis.
+                    Agen dibuat aktif dengan status belum Verifikasi Agent.
                 </p>
             </div>
         </div>
@@ -285,33 +246,6 @@
         nikCount.textContent = nikInput.value.length;
     }
 
-    // Proof of payment file preview
-    const proofInput = document.getElementById('input-proof');
-    const previewWrapper = document.getElementById('proof-preview-wrapper');
-    const previewImg = document.getElementById('proof-preview-img');
-
-    if (proofInput && previewWrapper && previewImg) {
-        proofInput.addEventListener('change', function () {
-            const file = this.files[0];
-            if (file) {
-                // If it's a PDF, we can't preview it as an img tag easily, so hide the preview
-                if (file.type === 'application/pdf') {
-                    previewWrapper.classList.add('d-none');
-                    previewImg.src = '';
-                } else {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        previewImg.src = e.target.result;
-                        previewWrapper.classList.remove('d-none');
-                    };
-                    reader.readAsDataURL(file);
-                }
-            } else {
-                previewWrapper.classList.add('d-none');
-                previewImg.src = '';
-            }
-        });
-    }
 </script>
 @endpush
 @endsection

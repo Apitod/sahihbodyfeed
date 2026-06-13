@@ -219,10 +219,12 @@
                             {!! $agent->upline?->nama ?? '<span class="text-muted fst-italic">—</span>' !!}
                         </td>
                         <td>
-                            @if($agent->user?->is_active)
+                            @if(! $agent->user?->is_active)
+                                <span class="badge bg-red-lt text-red">Tidak Aktif</span>
+                            @elseif($agent->has_verified_agent)
                                 <span class="badge bg-green-lt text-green">Aktif</span>
                             @else
-                                <span class="badge bg-red-lt text-red">Tidak Aktif</span>
+                                <span class="badge bg-yellow-lt text-yellow">Belum Verifikasi Agent</span>
                             @endif
                         </td>
                         <td>

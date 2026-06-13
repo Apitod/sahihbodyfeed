@@ -90,13 +90,17 @@
                     <span class="badge {{ $levelColor }} mb-3">{{ $agent->status->label() }}</span>
 
                     <div class="d-flex justify-content-center mb-3">
-                        @if($agent->user?->is_active)
+                        @if(! $agent->user?->is_active)
+                            <span class="badge bg-red-lt text-red px-3 py-2">
+                                <span class="status-dot bg-red me-1"></span> Tidak Aktif / Suspended
+                            </span>
+                        @elseif($agent->has_verified_agent)
                             <span class="badge bg-green-lt text-green px-3 py-2">
                                 <span class="status-dot status-dot-animated bg-green me-1"></span> Aktif
                             </span>
                         @else
-                            <span class="badge bg-red-lt text-red px-3 py-2">
-                                <span class="status-dot bg-red me-1"></span> Tidak Aktif / Suspended
+                            <span class="badge bg-yellow-lt text-yellow px-3 py-2">
+                                <span class="status-dot bg-yellow me-1"></span> Belum Verifikasi Agent
                             </span>
                         @endif
                     </div>

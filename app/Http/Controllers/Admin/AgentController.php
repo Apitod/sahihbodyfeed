@@ -46,7 +46,12 @@ class AgentController extends Controller
     public function index(Request $request): View
     {
         $query = Agent::with(['user', 'upline'])
-            ->withCount('downlines');
+            ->withCount('downlines')
+            ->withExists([
+                'transactions as has_verified_agent' => fn ($q) => $q
+                    ->where('type', TransactionType::NewAgent)
+                    ->where('status', TransactionStatus::Approved),
+            ]);
 
         // Search by name or username.
         if ($search = $request->input('search')) {
@@ -86,6 +91,11 @@ class AgentController extends Controller
     public function show(Agent $agent): View
     {
         $agent->load(['user', 'upline.user']);
+        $agent->loadExists([
+            'transactions as has_verified_agent' => fn ($q) => $q
+                ->where('type', TransactionType::NewAgent)
+                ->where('status', TransactionStatus::Approved),
+        ]);
 
         $downlines = $agent->downlines()
             ->with('user')
@@ -146,15 +156,10 @@ class AgentController extends Controller
             'bank_account_name' => 'nullable|string|max:100',
             // ── Hierarchy ────────────────────────────────────────────────────────────
             'upline_id'         => 'nullable|exists:agents,id',
-            // ── Payment proof (wajib) ────────────────────────────────────────────────
-            'proof_of_payment'  => 'required|file|mimes:jpg,jpeg,png,webp,pdf|max:5120',
         ]);
 
-        // Upload bukti pembayaran ke disk public → storage/app/public/payments/
-        $proofPath = $request->file('proof_of_payment')->store('payments', 'public');
-
-        DB::transaction(function () use ($validated, $proofPath, $request) {
-            // 1. Buat user aktif.
+        DB::transaction(function () use ($validated) {
+            // 1. Buat user aktif, tetapi verifikasi agent tetap menunggu transaksi Rp2.650.000 disetujui.
             $user = User::create([
                 'username'  => $validated['username'],
                 'password'  => Hash::make($validated['password']),
@@ -177,35 +182,16 @@ class AgentController extends Controller
                 'upline_id'         => $validated['upline_id']         ?? null,
                 'total_points'      => 0,
                 'status'            => AgentStatus::Agent,
-                'joined_at'         => now(),
+                'joined_at'         => null,
             ]);
 
-            // 3. Buat transaction NewAgent (approved) dengan bukti pembayaran.
-            //    Admin yang login dianggap sebagai verifier.
-            $transaction = Transaction::create([
-                'agent_id'                  => $agent->id,
-                'type'                      => TransactionType::NewAgent,
-                'amount'                    => TransactionType::NewAgent->amount(),
-                'status'                    => TransactionStatus::Approved,
-                'proof_of_payment'          => $proofPath,
-                'verified_by_superadmin_id' => $request->user()->id,
-                'verified_at'               => now(),
-            ]);
-
-            // 4. Distribusi komisi ke upline (Gen-1 Rp450k, Gen-2 Rp100k, Gen-3 Rp100k).
-            $commissions = $this->commissionService->distribute($transaction);
-
-            Log::info(
-                "Admin created & activated agent [{$agent->id}] ({$validated['nama']}). " .
-                "Transaction [{$transaction->id}] Rp" . number_format(TransactionType::NewAgent->amount()) . " approved. " .
-                count($commissions) . " commission(s) distributed."
-            );
+            Log::info("Admin created agent [{$agent->id}] ({$validated['nama']}) pending agent verification.");
         });
 
         $baseRoute = auth()->user()->isSuperAdmin() ? 'superadmin.agents' : 'admin.agents';
 
         return redirect()->route($baseRoute . '.index')
-            ->with('success', "Agen '{$validated['nama']}' berhasil dibuat. Transaksi Rp2.650.000 & komisi upline tercatat otomatis.");
+            ->with('success', "Agen '{$validated['nama']}' berhasil dibuat. Lakukan Verifikasi Agent Rp2.650.000 untuk menyelesaikan status verifikasi agent.");
     }
 
     // ─── Edit / Update ────────────────────────────────────────────────────────

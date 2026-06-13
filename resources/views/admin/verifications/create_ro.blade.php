@@ -83,10 +83,12 @@
                                         @username: <strong>{{ $agent->user->username }}</strong>
                                         &nbsp;·&nbsp;
                                         Status:
-                                        @if($agent->user?->is_active)
+                                        @if(! $agent->user?->is_active)
+                                            <span class="bg-red-lt text-red badge">Tidak Aktif</span>
+                                        @elseif($hasApprovedVerification)
                                             <span class="bg-green-lt text-green badge">Aktif</span>
                                         @else
-                                            <span class="bg-red-lt text-red badge">Tidak Aktif</span>
+                                            <span class="bg-yellow-lt text-yellow badge">Belum Verifikasi Agent</span>
                                         @endif
                                         &nbsp;·&nbsp;
                                         Pangkat: <span class="bg-blue-lt text-blue badge">{{ $agent->status->label() }}</span>
@@ -104,7 +106,13 @@
             </div>
 
             {{-- ── STEP 2: Form Buat RO ─────────────────────────────────── --}}
-            @if($agent && $agent->user?->is_active)
+            @if($agent && $agent->user?->is_active && ! $hasApprovedVerification)
+                <div class="alert alert-warning shadow-sm" role="alert">
+                    Agen belum Verifikasi Agent, tidak bisa dibuatkan Repeat Order.
+                </div>
+            @endif
+
+            @if($agent && $agent->user?->is_active && $hasApprovedVerification)
             <div class="shadow-sm border-0 card" id="step-form">
                 <div class="card-header">
                     <h3 class="card-title">

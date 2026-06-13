@@ -33,6 +33,10 @@ class VerificationController extends Controller
         $statusFilter = $request->get('status', 'pending_superadmin');
 
         $transactions = Transaction::with(['agent.user', 'adminVerifier:id,username', 'superadminVerifier:id,username'])
+            ->where(function ($q) {
+                $q->where('type', '!=', TransactionType::NewAgent)
+                    ->orWhere('amount', '>', 0);
+            })
             ->when($statusFilter !== 'all', fn ($q) => $q->where('status', $statusFilter))
             ->latest()
             ->paginate(50);

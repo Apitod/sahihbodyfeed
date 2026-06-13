@@ -50,6 +50,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/verifications/transactions', [Admin\VerificationController::class, 'transactionsList'])->name('verifications.transactions');
     Route::get('/verifications/transactions/create-ro', [Admin\VerificationController::class, 'createRepeatOrder'])->name('verifications.ro.create');
     Route::post('/verifications/transactions/create-ro', [Admin\VerificationController::class, 'storeRepeatOrder'])->name('verifications.ro.store');
+    Route::get('/verifications/transactions/verify-agent', [Admin\VerificationController::class, 'createAgentVerification'])->name('verifications.agent.create');
+    Route::post('/verifications/transactions/verify-agent', [Admin\VerificationController::class, 'storeAgentVerification'])->name('verifications.agent.store');
     Route::post('/verifications/transactions/{transaction}/approve', [Admin\VerificationController::class, 'approveTransaction'])->name('transactions.approve');
     Route::post('/verifications/transactions/{transaction}/reject', [Admin\VerificationController::class, 'rejectTransaction'])->name('transactions.reject');
 
