@@ -18,11 +18,11 @@ class NetworkController extends Controller
     {
         $agent = $request->user()->agent;
 
-        // Build the nested tree starting from the logged-in agent
+        // Build the nested tree starting from the logged-in agent.
         $tree = $this->buildTree($agent, 0);
 
-        // Count total unique descendants (all agents below root)
-        $totalTeam = $this->countDescendants($agent);
+        // Derive team count from the already-built tree (no second DB traversal).
+        $totalTeam = $this->countFromTree($tree);
 
         return view('agent.network.index', compact('tree', 'totalTeam'));
     }
@@ -62,6 +62,19 @@ class NetworkController extends Controller
         $agent->load('downlines');
         foreach ($agent->downlines as $downline) {
             $count += 1 + $this->countDescendants($downline);
+        }
+        return $count;
+    }
+
+    /**
+     * Derive total descendant count from an already-built tree array.
+     * Avoids a second recursive DB traversal.
+     */
+    private function countFromTree(array $node): int
+    {
+        $count = 0;
+        foreach ($node['children'] as $child) {
+            $count += 1 + $this->countFromTree($child);
         }
         return $count;
     }

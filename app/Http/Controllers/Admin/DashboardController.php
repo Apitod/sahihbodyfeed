@@ -7,6 +7,7 @@ use App\Models\Agent;
 use App\Models\Transaction;
 use App\Models\RewardClaim;
 use App\Models\Commission;
+use App\Enums\TransactionStatus;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -21,7 +22,7 @@ class DashboardController extends Controller
             'new_agents_month' => Agent::whereMonth('joined_at', $now->month)->whereYear('joined_at', $now->year)->count(),
             'pending_verifications' => Transaction::where('status', 'pending')->count(),
             'pending_reward_claims' => RewardClaim::where('status', 'pending')->count(),
-            'total_transactions_value' => Transaction::where('status', 'verified')->sum('amount'),
+            'total_transactions_value' => Transaction::where('status', TransactionStatus::Approved)->sum('amount'),
             'total_commissions_generated' => Commission::sum('amount'),
             'total_paid_commissions' => Commission::where('status', 'paid')->sum('amount'),
         ];

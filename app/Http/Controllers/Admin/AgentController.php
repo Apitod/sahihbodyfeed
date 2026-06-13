@@ -8,8 +8,10 @@ use App\Enums\TransactionType;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\Agent;
+use App\Models\Transaction;
 use App\Models\User;
 use App\Services\AgentRegistrationService;
+use App\Services\CommissionDistributionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +34,7 @@ class AgentController extends Controller
 {
     public function __construct(
         private readonly AgentRegistrationService $registrationService,
+        private readonly CommissionDistributionService $commissionService,
     ) {}
 
     // ─── Index ────────────────────────────────────────────────────────────────
@@ -120,10 +123,10 @@ class AgentController extends Controller
     /**
      * Persist a brand-new agent created by the admin.
      *
-     * Admin-created agents are immediately activated — no payment proof or
-     * transaction verification step is required.
-     *
-     * NIK is stored as a plain string (max 16 digits) to avoid file storage overhead.
+     * Admin-created agents are immediately activated.
+     * A proof_of_payment upload is required. Upon successful creation an
+     * approved Transaction record (Rp2.650.000) is written automatically,
+     * and upline commissions are distributed via CommissionDistributionService.
      */
     public function store(Request $request): RedirectResponse
     {
@@ -143,9 +146,15 @@ class AgentController extends Controller
             'bank_account_name' => 'nullable|string|max:100',
             // ── Hierarchy ────────────────────────────────────────────────────────────
             'upline_id'         => 'nullable|exists:agents,id',
+            // ── Payment proof (wajib) ────────────────────────────────────────────────
+            'proof_of_payment'  => 'required|file|mimes:jpg,jpeg,png,webp,pdf|max:5120',
         ]);
 
-        DB::transaction(function () use ($validated) {
+        // Upload bukti pembayaran ke disk public → storage/app/public/payments/
+        $proofPath = $request->file('proof_of_payment')->store('payments', 'public');
+
+        DB::transaction(function () use ($validated, $proofPath, $request) {
+            // 1. Buat user aktif.
             $user = User::create([
                 'username'  => $validated['username'],
                 'password'  => Hash::make($validated['password']),
@@ -155,7 +164,8 @@ class AgentController extends Controller
 
             $user->assignRole('agent');
 
-            Agent::create([
+            // 2. Buat agent.
+            $agent = Agent::create([
                 'user_id'           => $user->id,
                 'nama'              => $validated['nama'],
                 'no_telp'           => $validated['no_telp']           ?? null,
@@ -170,13 +180,32 @@ class AgentController extends Controller
                 'joined_at'         => now(),
             ]);
 
-            Log::info("Admin created agent [{$validated['nama']}] with user [{$user->id}].");
+            // 3. Buat transaction NewAgent (approved) dengan bukti pembayaran.
+            //    Admin yang login dianggap sebagai verifier.
+            $transaction = Transaction::create([
+                'agent_id'                  => $agent->id,
+                'type'                      => TransactionType::NewAgent,
+                'amount'                    => TransactionType::NewAgent->amount(),
+                'status'                    => TransactionStatus::Approved,
+                'proof_of_payment'          => $proofPath,
+                'verified_by_superadmin_id' => $request->user()->id,
+                'verified_at'               => now(),
+            ]);
+
+            // 4. Distribusi komisi ke upline (Gen-1 Rp450k, Gen-2 Rp100k, Gen-3 Rp100k).
+            $commissions = $this->commissionService->distribute($transaction);
+
+            Log::info(
+                "Admin created & activated agent [{$agent->id}] ({$validated['nama']}). " .
+                "Transaction [{$transaction->id}] Rp" . number_format(TransactionType::NewAgent->amount()) . " approved. " .
+                count($commissions) . " commission(s) distributed."
+            );
         });
 
         $baseRoute = auth()->user()->isSuperAdmin() ? 'superadmin.agents' : 'admin.agents';
 
         return redirect()->route($baseRoute . '.index')
-            ->with('success', "Agen '{$validated['nama']}' berhasil dibuat.");
+            ->with('success', "Agen '{$validated['nama']}' berhasil dibuat. Transaksi Rp2.650.000 & komisi upline tercatat otomatis.");
     }
 
     // ─── Edit / Update ────────────────────────────────────────────────────────

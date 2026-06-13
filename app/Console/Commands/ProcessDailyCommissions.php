@@ -40,15 +40,22 @@ class ProcessDailyCommissions extends Command
 
         $this->info("Processing commissions for date: {$targetDate} (WITA)");
 
-        // Find all menunggu commissions whose created_at falls on the target date.
+        // Convert WITA target date to UTC boundaries so we correctly match
+        // created_at timestamps stored by MySQL/PostgreSQL in UTC.
+        // e.g. WITA 2024-01-15 00:00 = UTC 2024-01-14 16:00
+        //      WITA 2024-01-15 23:59 = UTC 2024-01-15 15:59
+        $startUtc = Carbon::parse($targetDate, $timezone)->startOfDay()->utc();
+        $endUtc   = Carbon::parse($targetDate, $timezone)->endOfDay()->utc();
+
+        // Find all menunggu commissions whose created_at falls on the target date (UTC-bounded range).
         $query = Commission::where('status', CommissionStatus::Menunggu)
-            ->whereDate('created_at', $targetDate);
+            ->whereBetween('created_at', [$startUtc, $endUtc]);
 
         $count = $query->count();
 
         if ($count === 0) {
             $this->info('No menunggu commissions found for this date. Nothing to process.');
-            Log::info("ProcessDailyCommissions: No menunggu commissions found for {$targetDate}.");
+            Log::info("ProcessDailyCommissions: No menunggu commissions found for {$targetDate} (UTC range: {$startUtc} – {$endUtc}).");
             return self::SUCCESS;
         }
 
@@ -57,14 +64,13 @@ class ProcessDailyCommissions extends Command
             return self::SUCCESS;
         }
 
+        // Sum BEFORE update (query is still unexecuted at this point).
+        $total = (clone $query)->sum('amount');
+
         // Bulk-update to pending inside a transaction.
         DB::transaction(function () use ($query, $count, $targetDate) {
             $query->update(['status' => CommissionStatus::Pending->value]);
         });
-
-        $total = Commission::where('status', CommissionStatus::Pending)
-            ->whereDate('updated_at', Carbon::now('Asia/Makassar')->toDateString())
-            ->sum('amount');
 
         $this->info("✔ Updated {$count} commission(s) to 'pending'. Total amount: Rp " . number_format($total));
 

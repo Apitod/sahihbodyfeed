@@ -30,7 +30,7 @@ class RewardController extends Controller
         // Prevent duplicate claims for the same reward if already pending or approved
         $existingClaim = $agent->rewardClaims()
                                ->where('reward_id', $reward->id)
-                               ->whereIn('status', ['pending', 'approved'])
+                               ->whereIn('status', ['pending', 'pending_superadmin', 'approved'])
                                ->first();
 
         if ($existingClaim) {

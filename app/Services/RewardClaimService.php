@@ -141,6 +141,8 @@ class RewardClaimService
 
             // ── STEP 3: Auto-update agent status ────────────────────────────
             // FC3: "Update Status Level Agen Otomatis"
+            // Refresh to get latest total_points in case a concurrent RO approval incremented it.
+            $agent->refresh();
             $newStatus = $agent->resolveStatus(); // Delegates to AgentStatus::fromPoints()
             $agent->update(['status' => $newStatus]);
             Log::info("RewardClaim: Agent[{$agent->id}] status updated to '{$newStatus->value}'.");
@@ -226,7 +228,7 @@ class RewardClaimService
             $claim->update([
                 'status'                    => ClaimStatus::Rejected,
                 'approved_by_superadmin_id' => $adminUser->id,
-                'approved_at'               => now(),
+                'approved_at'               => now(), // acts as actioned_at; populated on both approve and reject
             ]);
 
             Log::warning("RewardClaim: Rejected — Claim[{$claim->id}] by Admin[{$adminUser->id}].");
@@ -255,6 +257,7 @@ class RewardClaimService
         $pendingLogs = MatchingRewardLog::where('sponsor_id', $sponsor->id)
                                         ->where('reward_id', $reward->id)
                                         ->where('status', MatchingRewardStatus::Pending)
+                                        ->lockForUpdate()
                                         ->get();
 
         if ($pendingLogs->isEmpty()) {

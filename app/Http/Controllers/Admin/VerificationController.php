@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\TransactionStatus;
 use App\Enums\TransactionType;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
@@ -17,15 +18,19 @@ class VerificationController extends Controller
         private readonly RepeatOrderService $repeatOrderService
     ) {}
 
-    public function transactionsList()
+    public function transactionsList(Request $request)
     {
-        // Simple query without data tables for MVP. Order pending first.
+        $statusFilter = $request->get('status', 'all');
+
         $transactions = Transaction::with(['agent.user', 'verifier'])
-            ->orderByRaw("CASE WHEN status = 'pending' THEN 1 WHEN status = 'verified' THEN 2 ELSE 3 END")
+            ->when($statusFilter !== 'all', fn ($q) => $q->where('status', $statusFilter))
+            ->orderByRaw("CASE WHEN status = 'pending' THEN 1 WHEN status = 'pending_superadmin' THEN 2 ELSE 3 END")
             ->latest()
             ->paginate(50);
-            
-        return view('admin.verifications.transactions', compact('transactions'));
+
+        $pendingCount = Transaction::where('status', TransactionStatus::Pending)->count();
+
+        return view('admin.verifications.transactions', compact('transactions', 'statusFilter', 'pendingCount'));
     }
 
     /**

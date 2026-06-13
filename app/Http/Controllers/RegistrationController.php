@@ -30,7 +30,7 @@ class RegistrationController extends Controller
     {
         $validated = $request->validate([
             'nama'              => 'required|string|max:50',
-            'phone'             => 'required|numeric|max_digits:15|unique:agents,phone',
+            'no_telp'           => 'required|numeric|max_digits:15|unique:agents,no_telp',
             'username'          => 'required|string|max:100|unique:users,username',
             'password'          => 'required|string|min:6|confirmed',
             'referral_agent_id' => 'nullable|exists:agents,id',

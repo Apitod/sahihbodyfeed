@@ -41,11 +41,6 @@ class RewardVerificationController extends Controller
             $superadmin = $request->user();
             $this->claimService->approveClaim($claim, $superadmin);
 
-            $claim->update([
-                'approved_by_superadmin_id' => $superadmin->id,
-                'approved_at'               => now(),
-            ]);
-
             return back()->with('success', "Klaim reward dari {$claim->agent->nama} disetujui.");
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -61,11 +56,6 @@ class RewardVerificationController extends Controller
         try {
             $superadmin = $request->user();
             $this->claimService->rejectClaim($claim, $superadmin);
-
-            $claim->update([
-                'approved_by_superadmin_id' => $superadmin->id,
-                'approved_at'               => now(),
-            ]);
 
             return back()->with('success', "Klaim reward #{$claim->id} ditolak.");
         } catch (\Exception $e) {

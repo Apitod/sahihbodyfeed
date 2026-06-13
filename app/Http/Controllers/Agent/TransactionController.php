@@ -36,8 +36,12 @@ class TransactionController extends Controller
 
     public function index(Request $request)
     {
-        $agentId = $request->user()->agent->id;
-        $transactions = $request->user()->agent->transactions()->latest()->paginate(20);
-        return view('agent.transactions.index', compact('transactions'));
+        $statusFilter = $request->get('status', 'all');
+        $transactions = $request->user()->agent->transactions()
+            ->when($statusFilter !== 'all', fn ($q) => $q->where('status', $statusFilter))
+            ->latest()
+            ->paginate(20);
+
+        return view('agent.transactions.index', compact('transactions', 'statusFilter'));
     }
 }
