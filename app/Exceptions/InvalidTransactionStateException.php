@@ -23,7 +23,7 @@ class InvalidTransactionStateException extends RuntimeException
         parent::__construct($message ?: sprintf(
             'Transaksi [#%d] memiliki status "%s" dan tidak dapat diproses untuk operasi ini.',
             $transaction->id,
-            $transaction->status->value,
+            $transaction->status?->value ?? 'unknown',
         ));
     }
 }

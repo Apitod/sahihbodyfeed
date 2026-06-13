@@ -83,6 +83,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
     Route::get('/dashboard', [Superadmin\DashboardController::class, 'index'])->name('dashboard');
 
+    // ─── Finance & Calculator Routes ───────────────────────────────────────
+    Route::get('/finance', [Superadmin\FinanceController::class, 'index'])->name('finance.index');
+    Route::post('/finance/calculate', [Superadmin\FinanceController::class, 'calculate'])->name('finance.calculate');
+    Route::get('/finance/pdf', [Superadmin\FinanceController::class, 'downloadPdf'])->name('finance.pdf');
+
     // Final approval verification
     Route::get('/verifications/transactions', [Superadmin\VerificationController::class, 'transactionsList'])->name('verifications.transactions');
     Route::post('/verifications/transactions/{transaction}/approve', [Superadmin\VerificationController::class, 'approveTransaction'])->name('transactions.approve');
