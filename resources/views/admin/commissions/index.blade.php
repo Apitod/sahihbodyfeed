@@ -87,7 +87,9 @@
                             default => $comm->type->value
                         } }}
                     </td>
-                    <td class="text-muted">Gen-{{ $comm->generation_level }}</td>
+                    <td class="text-muted">
+                        {{ $comm->type->value === 'repeat_order' ? 'Sponsor RO' : 'Gen-' . $comm->generation_level }}
+                    </td>
                     <td>
                         @php
                             $badgeColor = match($comm->status->value) {
