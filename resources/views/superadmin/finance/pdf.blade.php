@@ -142,46 +142,72 @@
         </tr>
     </table>
 
+    @php
+        $hasPromo = ! empty($data['promo_start']) && ! empty($data['promo_end']);
+    @endphp
+
     <div class="section-title">Parameter Perhitungan & Event</div>
     <table class="data-table">
         <thead>
             <tr>
                 <th>Item / Tipe Transaksi</th>
-                <th>Jumlah Transaksi</th>
-                <th>Bonus / Event</th>
-                <th>Transaksi dengan Bonus</th>
+                <th>Total</th>
+                <th>Botol/Transaksi</th>
+                @if($hasPromo)
+                    <th>Dalam Promo</th>
+                    <th>Luar Promo</th>
+                    <th>Botol Promo</th>
+                    <th>Bonus</th>
+                @endif
                 <th>Total Produk Keluar</th>
             </tr>
         </thead>
         <tbody>
+            @if($data['new_agent_count'] > 0)
             <tr>
-                <td><strong>Registrasi Agen Baru (New Agent)</strong></td>
+                <td><strong>Registrasi Agent</strong></td>
                 <td>{{ $data['new_agent_count'] }} kali</td>
-                <td>+{{ $data['bonus_new_agent'] }} botol</td>
-                <td>{{ $data['new_agent_bonus_cnt'] }} kali</td>
+                <td>10 botol</td>
+                @if($hasPromo)
+                    <td>{{ $data['new_agent_promo_count'] }} kali</td>
+                    <td>{{ $data['new_agent_count'] - $data['new_agent_promo_count'] }} kali</td>
+                    <td>{{ $data['bonus_new_agent'] }} botol</td>
+                    <td>+{{ max(0, $data['bonus_new_agent'] - 10) }} botol</td>
+                @endif
                 <td>
                     @php
-                        $regularNewAgent = $data['new_agent_count'] - $data['new_agent_bonus_cnt'];
-                        $totalNewAgent = ($regularNewAgent * 10) + ($data['new_agent_bonus_cnt'] * (10 + $data['bonus_new_agent']));
+                        $totalNewAgent = (($data['new_agent_count'] - $data['new_agent_promo_count']) * 10) + ($data['new_agent_promo_count'] * $data['bonus_new_agent']);
                     @endphp
                     {{ $totalNewAgent }} botol
                 </td>
             </tr>
+            @endif
+            @if($data['ro_count'] > 0)
             <tr>
                 <td><strong>Repeat Order (RO)</strong></td>
                 <td>{{ $data['ro_count'] }} kali</td>
-                <td>+{{ $data['bonus_repeat_order'] }} botol</td>
-                <td>{{ $data['ro_bonus_cnt'] }} kali</td>
+                <td>10 botol</td>
+                @if($hasPromo)
+                    <td>{{ $data['ro_promo_count'] }} kali</td>
+                    <td>{{ $data['ro_count'] - $data['ro_promo_count'] }} kali</td>
+                    <td>{{ $data['bonus_repeat_order'] }} botol</td>
+                    <td>+{{ max(0, $data['bonus_repeat_order'] - 10) }} botol</td>
+                @endif
                 <td>
                     @php
-                        $regularRO = $data['ro_count'] - $data['ro_bonus_cnt'];
-                        $totalRO = ($regularRO * 10) + ($data['ro_bonus_cnt'] * (10 + $data['bonus_repeat_order']));
+                        $totalRO = (($data['ro_count'] - $data['ro_promo_count']) * 10) + ($data['ro_promo_count'] * $data['bonus_repeat_order']);
                     @endphp
                     {{ $totalRO }} botol
                 </td>
             </tr>
+            @endif
+            @if($data['new_agent_count'] <= 0 && $data['ro_count'] <= 0)
+            <tr>
+                <td colspan="{{ $hasPromo ? 8 : 4 }}" style="text-align: center;">Belum ada transaksi approved.</td>
+            </tr>
+            @endif
             <tr class="total-row">
-                <td colspan="4" style="text-align: right;">Total Mutasi Keluar:</td>
+                <td colspan="{{ $hasPromo ? 7 : 3 }}" style="text-align: right;">Total Mutasi Keluar:</td>
                 <td>{{ $data['total_keluar'] }} botol</td>
             </tr>
         </tbody>

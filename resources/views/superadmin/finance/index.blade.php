@@ -305,28 +305,28 @@
 
                                 {{-- Bonus New Agent --}}
                                 <div class="mb-3">
-                                    <label class="form-label">Bonus Produk - Registrasi Agen Baru (per transaksi)</label>
+                                    <label class="form-label">Botol per Registrasi Agent saat Promo</label>
                                     <div class="input-group">
                                         <button type="button" class="btn btn-outline-secondary btn-spinner" id="btn-bonus-na-minus">-</button>
                                         <input type="number" id="bonus_new_agent" name="bonus_new_agent"
                                                class="form-control text-center"
-                                               value="{{ $calculations['bonus_new_agent'] ?? 0 }}">
+                                               value="{{ $calculations['bonus_new_agent'] ?? 10 }}">
                                         <button type="button" class="btn btn-outline-secondary btn-spinner" id="btn-bonus-na-plus">+</button>
                                     </div>
-                                    <span class="form-hint mt-1">Default registrasi baru = 10 botol. Nilai ini adalah botol tambahan (+N).</span>
+                                    <span class="form-hint mt-1">Di luar periode promo tetap 10 botol. Saat promo mengikuti input; jika lebih dari 10, selisihnya tampil sebagai bonus.</span>
                                 </div>
 
                                 {{-- Bonus Repeat Order --}}
                                 <div class="mb-3">
-                                    <label class="form-label">Bonus Produk - Repeat Order (per transaksi)</label>
+                                    <label class="form-label">Botol per Repeat Order saat Promo</label>
                                     <div class="input-group">
                                         <button type="button" class="btn btn-outline-secondary btn-spinner" id="btn-bonus-ro-minus">-</button>
                                         <input type="number" id="bonus_repeat_order" name="bonus_repeat_order"
                                                class="form-control text-center"
-                                               value="{{ $calculations['bonus_repeat_order'] ?? 0 }}">
+                                               value="{{ $calculations['bonus_repeat_order'] ?? 10 }}">
                                         <button type="button" class="btn btn-outline-secondary btn-spinner" id="btn-bonus-ro-plus">+</button>
                                     </div>
-                                    <span class="form-hint mt-1">Default repeat order = 10 botol. Nilai ini adalah botol tambahan (+N).</span>
+                                    <span class="form-hint mt-1">Di luar periode promo tetap 10 botol. Saat promo mengikuti input; jika lebih dari 10, selisihnya tampil sebagai bonus.</span>
                                 </div>
 
                                 <div class="d-grid mt-4 gap-2">
@@ -344,11 +344,13 @@
                         <input type="hidden" name="total_keluar" id="pdf-total-keluar" value="{{ $calculations['total_keluar'] ?? 0 }}">
                         <input type="hidden" name="sisa_stok" id="pdf-sisa-stok" value="{{ $calculations['sisa_stok'] ?? 0 }}">
                         <input type="hidden" name="new_agent_count" id="pdf-new-agent-count" value="{{ $calculations['new_agent_count'] ?? 0 }}">
+                        <input type="hidden" name="new_agent_promo_count" id="pdf-new-agent-promo-count" value="{{ $calculations['new_agent_promo_count'] ?? 0 }}">
                         <input type="hidden" name="new_agent_bonus_cnt" id="pdf-new-agent-bonus-cnt" value="{{ $calculations['new_agent_bonus_cnt'] ?? 0 }}">
                         <input type="hidden" name="ro_count" id="pdf-ro-count" value="{{ $calculations['ro_count'] ?? 0 }}">
+                        <input type="hidden" name="ro_promo_count" id="pdf-ro-promo-count" value="{{ $calculations['ro_promo_count'] ?? 0 }}">
                         <input type="hidden" name="ro_bonus_cnt" id="pdf-ro-bonus-cnt" value="{{ $calculations['ro_bonus_cnt'] ?? 0 }}">
-                        <input type="hidden" name="bonus_new_agent" id="pdf-bonus-new-agent" value="{{ $calculations['bonus_new_agent'] ?? 0 }}">
-                        <input type="hidden" name="bonus_repeat_order" id="pdf-bonus-repeat-order" value="{{ $calculations['bonus_repeat_order'] ?? 0 }}">
+                        <input type="hidden" name="bonus_new_agent" id="pdf-bonus-new-agent" value="{{ $calculations['bonus_new_agent'] ?? 10 }}">
+                        <input type="hidden" name="bonus_repeat_order" id="pdf-bonus-repeat-order" value="{{ $calculations['bonus_repeat_order'] ?? 10 }}">
                         <input type="hidden" name="promo_start" id="pdf-promo-start" value="{{ $calculations['promo_start'] ?? '' }}">
                         <input type="hidden" name="promo_end" id="pdf-promo-end" value="{{ $calculations['promo_end'] ?? '' }}">
 
@@ -390,31 +392,41 @@
                                 </div>
                             </div>
 
-                            <h4 class="section-title text-muted mb-3">Rincian Perhitungan Transaksi (Bulan Ini)</h4>
+                            <h4 class="section-title text-muted mb-3">Rincian Perhitungan Transaksi Approved</h4>
 
                             <div class="table-responsive">
                                 <table class="table table-bordered table-vcenter">
                                     <thead>
                                         <tr>
                                             <th>Tipe Mutasi</th>
-                                            <th class="text-center">Jumlah Transaksi</th>
+                                            <th class="text-center">Total</th>
+                                            <th class="text-center">Botol/Transaksi</th>
+                                            <th class="text-center promo-only">Dalam Promo</th>
+                                            <th class="text-center promo-only">Luar Promo</th>
+                                            <th class="text-center promo-only">Botol Promo</th>
+                                            <th class="text-center promo-only">Bonus</th>
                                             <th class="text-center">Total Botol</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
+                                        <tr id="preview-na-row">
                                             <td>
-                                                <strong>Registrasi Agen Baru</strong><br>
+                                                <strong>Registrasi Agent</strong><br>
                                                 <small class="text-muted" id="preview-na-detail">
                                                     Basis: 10 botol
                                                 </small>
                                             </td>
                                             <td class="text-center" id="preview-na-count">{{ $calculations['new_agent_count'] ?? 0 }}</td>
+                                            <td class="text-center" id="preview-na-bottle-default">10</td>
+                                            <td class="text-center promo-only" id="preview-na-promo-count">{{ $calculations['new_agent_promo_count'] ?? 0 }}</td>
+                                            <td class="text-center promo-only" id="preview-na-regular-count">{{ ($calculations['new_agent_count'] ?? 0) - ($calculations['new_agent_promo_count'] ?? 0) }}</td>
+                                            <td class="text-center promo-only" id="preview-na-bottle-promo">{{ $calculations['bonus_new_agent'] ?? 10 }}</td>
+                                            <td class="text-center promo-only" id="preview-na-bonus">+{{ max(0, ($calculations['bonus_new_agent'] ?? 10) - 10) }}</td>
                                             <td class="text-center fw-bold" id="preview-na-total">
-                                                {{ ($calculations['new_agent_count'] ?? 0) * 10 }} botol
+                                                {{ (($calculations['new_agent_count'] ?? 0) - ($calculations['new_agent_promo_count'] ?? 0)) * 10 + (($calculations['new_agent_promo_count'] ?? 0) * ($calculations['bonus_new_agent'] ?? 10)) }} botol
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr id="preview-ro-row">
                                             <td>
                                                 <strong>Repeat Order (RO)</strong><br>
                                                 <small class="text-muted" id="preview-ro-detail">
@@ -422,15 +434,23 @@
                                                 </small>
                                             </td>
                                             <td class="text-center" id="preview-ro-count">{{ $calculations['ro_count'] ?? 0 }}</td>
+                                            <td class="text-center" id="preview-ro-bottle-default">10</td>
+                                            <td class="text-center promo-only" id="preview-ro-promo-count">{{ $calculations['ro_promo_count'] ?? 0 }}</td>
+                                            <td class="text-center promo-only" id="preview-ro-regular-count">{{ ($calculations['ro_count'] ?? 0) - ($calculations['ro_promo_count'] ?? 0) }}</td>
+                                            <td class="text-center promo-only" id="preview-ro-bottle-promo">{{ $calculations['bonus_repeat_order'] ?? 10 }}</td>
+                                            <td class="text-center promo-only" id="preview-ro-bonus">+{{ max(0, ($calculations['bonus_repeat_order'] ?? 10) - 10) }}</td>
                                             <td class="text-center fw-bold" id="preview-ro-total">
-                                                {{ ($calculations['ro_count'] ?? 0) * 10 }} botol
+                                                {{ (($calculations['ro_count'] ?? 0) - ($calculations['ro_promo_count'] ?? 0)) * 10 + (($calculations['ro_promo_count'] ?? 0) * ($calculations['bonus_repeat_order'] ?? 10)) }} botol
                                             </td>
+                                        </tr>
+                                        <tr id="preview-empty-row" style="display:none;">
+                                            <td colspan="8" class="text-center text-muted py-4">Belum ada transaksi approved.</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
 
-                            <div class="alert alert-info small mt-3">
+                            <div class="alert alert-info small mt-3" id="preview-promo-alert">
                                 <strong>Periode Promo Diterapkan:</strong>
                                 <span id="preview-promo-period">Tidak ada promo aktif dalam rentang perhitungan.</span>
                             </div>
@@ -479,8 +499,9 @@ document.addEventListener("DOMContentLoaded", function() {
         });
 
         btnPlus.addEventListener('click', function() {
+            const hasPromo = document.querySelector('[name=promo_start]').value && document.querySelector('[name=promo_end]').value;
             let val = parseInt(input.value) || 0;
-            val += 1;
+            val = hasPromo ? val + 1 : Math.min(10, val + 1);
             input.value = val;
             updatePreview();
         });
@@ -497,34 +518,46 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // ── Live Preview (client-side) ─────────────────────────────────
     // Counts loaded from PHP on page load
+    const TRANSACTIONS = @json($currentMonthTransactions);
     const COUNTS = {
-        new_agent:   {{ $calculations['new_agent_count'] ?? 0 }},
-        repeat_order:{{ $calculations['ro_count'] ?? 0 }},
+        new_agent: TRANSACTIONS.filter((txn) => txn.type === 'new_agent').length,
+        repeat_order: TRANSACTIONS.filter((txn) => txn.type === 'repeat_order').length,
     };
 
     function updatePreview() {
         const stokAwal  = parseInt(document.getElementById('stok_awal').value) || 0;
-        const bonusNA   = parseInt(document.getElementById('bonus_new_agent').value) || 0;
-        const bonusRO   = parseInt(document.getElementById('bonus_repeat_order').value) || 0;
         const promoStart = document.querySelector('[name=promo_start]').value;
         const promoEnd   = document.querySelector('[name=promo_end]').value;
+        const hasPromo = promoStart && promoEnd;
+        const bonusNAInput = document.getElementById('bonus_new_agent');
+        const bonusROInput = document.getElementById('bonus_repeat_order');
+        let bonusNA = parseInt(bonusNAInput.value) || 0;
+        let bonusRO = parseInt(bonusROInput.value) || 0;
 
-        // All approved transactions this month (count only — exact matching done server-side)
+        if (!hasPromo) {
+            bonusNA = Math.min(10, bonusNA);
+            bonusRO = Math.min(10, bonusRO);
+            bonusNAInput.value = bonusNA;
+            bonusROInput.value = bonusRO;
+        }
+
+        // All approved transactions from database
         const naCount = COUNTS.new_agent;
         const roCount = COUNTS.repeat_order;
 
-        // Default: no promo → every txn = 10 bottles
-        const naTotalDefault = naCount * 10;
-        const roTotalDefault = roCount * 10;
-
-        // If promo range set, ALL approved transactions this month get the bonus
-        // (promo range is a subset of the current month filter)
-        const naTotal = promoStart && promoEnd
-            ? naCount * (10 + bonusNA)
-            : naTotalDefault;
-        const roTotal = promoStart && promoEnd
-            ? roCount * (10 + bonusRO)
-            : roTotalDefault;
+        const promoTransactions = hasPromo
+            ? TRANSACTIONS.filter((txn) => txn.verified_at && txn.verified_at >= promoStart && txn.verified_at <= promoEnd)
+            : [];
+        const naPromoCount = promoTransactions.filter((txn) => txn.type === 'new_agent').length;
+        const roPromoCount = promoTransactions.filter((txn) => txn.type === 'repeat_order').length;
+        const naRegularCount = naCount - naPromoCount;
+        const roRegularCount = roCount - roPromoCount;
+        const naBonusPerTxn = Math.max(0, bonusNA - 10);
+        const roBonusPerTxn = Math.max(0, bonusRO - 10);
+        const naBonusCount = naBonusPerTxn > 0 ? naPromoCount : 0;
+        const roBonusCount = roBonusPerTxn > 0 ? roPromoCount : 0;
+        const naTotal = (naRegularCount * 10) + (naPromoCount * bonusNA);
+        const roTotal = (roRegularCount * 10) + (roPromoCount * bonusRO);
 
         const totalKeluar = naTotal + roTotal;
         const sisaStok    = stokAwal - totalKeluar;
@@ -541,21 +574,50 @@ document.addEventListener("DOMContentLoaded", function() {
         // Update table rows
         const el = (id) => document.getElementById(id);
         if (el('preview-na-count'))  el('preview-na-count').textContent  = naCount;
+        if (el('preview-na-promo-count')) el('preview-na-promo-count').textContent = naPromoCount;
+        if (el('preview-na-regular-count')) el('preview-na-regular-count').textContent = naRegularCount;
+        if (el('preview-na-bottle-promo')) el('preview-na-bottle-promo').textContent = bonusNA;
+        if (el('preview-na-bonus')) el('preview-na-bonus').textContent = '+' + naBonusPerTxn;
         if (el('preview-na-total'))  el('preview-na-total').textContent  = naTotal + ' botol';
         if (el('preview-na-detail')) el('preview-na-detail').textContent =
-            promoStart && promoEnd
-                ? 'Basis: 10 botol + ' + bonusNA + ' bonus (' + naCount + ' transaksi dalam promo)'
-                : 'Basis: 10 botol (tanpa promo)';
+            hasPromo
+                ? 'Luar promo 10 botol, dalam promo ' + bonusNA + ' botol'
+                : 'Tidak ada periode promo, semua transaksi 10 botol';
         if (el('preview-ro-count'))  el('preview-ro-count').textContent  = roCount;
+        if (el('preview-ro-promo-count')) el('preview-ro-promo-count').textContent = roPromoCount;
+        if (el('preview-ro-regular-count')) el('preview-ro-regular-count').textContent = roRegularCount;
+        if (el('preview-ro-bottle-promo')) el('preview-ro-bottle-promo').textContent = bonusRO;
+        if (el('preview-ro-bonus')) el('preview-ro-bonus').textContent = '+' + roBonusPerTxn;
         if (el('preview-ro-total'))  el('preview-ro-total').textContent  = roTotal + ' botol';
         if (el('preview-ro-detail')) el('preview-ro-detail').textContent =
-            promoStart && promoEnd
-                ? 'Basis: 10 botol + ' + bonusRO + ' bonus (' + roCount + ' transaksi dalam promo)'
-                : 'Basis: 10 botol (tanpa promo)';
-        if (el('preview-promo-period')) el('preview-promo-period').textContent =
-            promoStart && promoEnd
-                ? promoStart + ' s/d ' + promoEnd
-                : 'Tidak ada promo aktif dalam rentang perhitungan.';
+            hasPromo
+                ? 'Luar promo 10 botol, dalam promo ' + bonusRO + ' botol'
+                : 'Tidak ada periode promo, semua transaksi 10 botol';
+        if (el('preview-promo-period')) el('preview-promo-period').textContent = promoStart + ' s/d ' + promoEnd;
+        if (el('preview-promo-alert')) el('preview-promo-alert').style.display = hasPromo ? '' : 'none';
+
+        document.querySelectorAll('.promo-only').forEach(function(item) {
+            item.style.display = hasPromo ? '' : 'none';
+        });
+        if (el('preview-na-row')) el('preview-na-row').style.display = naCount > 0 ? '' : 'none';
+        if (el('preview-ro-row')) el('preview-ro-row').style.display = roCount > 0 ? '' : 'none';
+        if (el('preview-empty-row')) el('preview-empty-row').style.display = (naCount + roCount) > 0 ? 'none' : '';
+        if (el('btn-bonus-na-plus')) el('btn-bonus-na-plus').disabled = !hasPromo && bonusNA >= 10;
+        if (el('btn-bonus-ro-plus')) el('btn-bonus-ro-plus').disabled = !hasPromo && bonusRO >= 10;
+
+        if (el('pdf-stok-awal')) el('pdf-stok-awal').value = stokAwal;
+        if (el('pdf-total-keluar')) el('pdf-total-keluar').value = totalKeluar;
+        if (el('pdf-sisa-stok')) el('pdf-sisa-stok').value = sisaStok;
+        if (el('pdf-new-agent-count')) el('pdf-new-agent-count').value = naCount;
+        if (el('pdf-new-agent-promo-count')) el('pdf-new-agent-promo-count').value = naPromoCount;
+        if (el('pdf-new-agent-bonus-cnt')) el('pdf-new-agent-bonus-cnt').value = naBonusCount;
+        if (el('pdf-ro-count')) el('pdf-ro-count').value = roCount;
+        if (el('pdf-ro-promo-count')) el('pdf-ro-promo-count').value = roPromoCount;
+        if (el('pdf-ro-bonus-cnt')) el('pdf-ro-bonus-cnt').value = roBonusCount;
+        if (el('pdf-bonus-new-agent')) el('pdf-bonus-new-agent').value = bonusNA;
+        if (el('pdf-bonus-repeat-order')) el('pdf-bonus-repeat-order').value = bonusRO;
+        if (el('pdf-promo-start')) el('pdf-promo-start').value = promoStart;
+        if (el('pdf-promo-end')) el('pdf-promo-end').value = promoEnd;
     }
 
     // Attach live update to all inputs
